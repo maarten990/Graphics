@@ -1,0 +1,4 @@
+*.o
+.*.swp
+basic_midpoint/main
+triangle_rasterization/trirast
