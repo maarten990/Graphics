@@ -34,11 +34,39 @@
  *
  */
 void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
-  int ix,iy;
-  int x,y;
-  
+
+
+  // Slope
+  double slope;
+  // The additional y value for the line
+  double addition
+
+  slope = (y1 - y0) / (x1 - x0);
+  addition = y0 - (slope * x0);
+  // Put pixels at the end and beginning
   PutPixel(s,x0,y0,colour);
   PutPixel(s,x1,y1,colour);
+
+  int y = y0;
+
+  for(int x = x0; x!= x1; x1++)
+  {
+      if( slope*x+1 + addition )
+      {
+          y = y + 1;
+      }
+
+  }
+  
+  // check octant
+  if((slope - 1) < 0)
+  {
+        
+  }
+  else{
+    printf("This code only works for the first octant");
+  }
+
   
   if(x1>x0) ix=1; else ix=-1;
   for(x=x0;x!=x1;x+=ix)
