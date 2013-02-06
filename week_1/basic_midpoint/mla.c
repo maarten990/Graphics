@@ -37,9 +37,9 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
     // Slope
     double slope;
 
-    if(x1 == x0 && x1> x0)
+    if(x1 == x0 && y1< y0)
     {
-        slope = 1000;
+        slope = 2;
     }
     else{  
     slope = (y1 - y0) / (double)(x1 - x0);
@@ -169,7 +169,7 @@ x = y0;
             }
 
         }
-        PutPixel(s,x1,y1, colour);
+        PutPixel(s,y1,x1, colour);
 
 
     }
