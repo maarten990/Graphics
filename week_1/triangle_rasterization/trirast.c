@@ -86,7 +86,7 @@ draw_triangle(float x0, float y0, float x1, float y1, float x2, float y2,
     float xmax = highest(x0, x1, x2);
 
     float ymin = lowest(y0, y1, y2);
-    float ymax = highest(x0, x1, x2);
+    float ymax = highest(y0, y1, y2);
 
     float alpha, beta, gamma;
 
@@ -97,7 +97,7 @@ draw_triangle(float x0, float y0, float x1, float y1, float x2, float y2,
             beta = line(x2, y2, x0, y0, x, y) / line(x2, y2, x0, y0, x1, y1);
             gamma = line(x0, y0, x1, y1, x, y) / line(x0, y0, x1, y1, x2, y2);
 
-            if (alpha >= 0 && beta >= 0 && gamma >= 0) {
+            if ((alpha >= 0) && (beta >= 0) && (gamma >= 0)) {
                 PutPixel(x, y, r, g, b);
             }
         }
@@ -112,20 +112,47 @@ draw_triangle_optimized(float x0, float y0, float x1, float y1, float x2, float 
     float xmax = highest(x0, x1, x2);
 
     float ymin = lowest(y0, y1, y2);
-    float ymax = highest(x0, x1, x2);
+    float ymax = highest(y0, y1, y2);
 
-    float alpha, beta, gamma;
+    float alpha, beta, gamma,
+          pre_loop_alpha,
+          pre_loop_beta,
+          pre_loop_gamma;
 
+    // initial, pre-loop values
+    float alpha_numerator = line(x1, y1, x2, y2, x0, y0);
+    float beta_numerator  = line(x2, y2, x0, y0, x1, y1);
+    float gamma_numerator = line(x0, y0, x1, y1, x2, y2);
+
+    alpha = line(x1, y1, x2, y2, xmin - 1, ymin - 1) / alpha_numerator;
+    beta  = line(x2, y2, x0, y0, xmin - 1, ymin - 1) / beta_numerator;
+    gamma = line(x0, y0, x1, y1, xmin - 1, ymin - 1) / gamma_numerator;
+            
     // loop through each pixel in the triangle bounding box
     for (float x = xmin; x < xmax; ++x) {
-        for (float y = ymin; y < ymax; ++y) {
-            alpha = line(x1, y1, x2, y2, x, y) / line(x1, y1, x2, y2, x0, y0);
-            beta = line(x2, y2, x0, y0, x, y) / line(x2, y2, x0, y0, x1, y1);
-            gamma = line(x0, y0, x1, y1, x, y) / line(x0, y0, x1, y1, x2, y2);
+        // update the x-variable componenents
+        alpha += (y1 - y2) / alpha_numerator;
+        beta += (y2 - y0) / beta_numerator;
+        gamma += (y0 - y1) / gamma_numerator;
 
-            if (alpha >= 0 && beta >= 0 && gamma >= 0) {
+        // save the parameter values before entering the y-loop
+        pre_loop_alpha = alpha;
+        pre_loop_beta  = beta;
+        pre_loop_gamma = gamma;
+
+        for (float y = ymin; y < ymax; ++y) {
+            // update the barycentric coordinates
+            alpha += (x2 - x1) / alpha_numerator;
+            beta += (x0 - x2) / beta_numerator;
+            gamma += (x1 - x0) / gamma_numerator;
+
+            if ((alpha >= 0) && (beta >= 0) && (gamma >= 0)) {
                 PutPixel(x, y, r, g, b);
             }
         }
+
+        alpha = pre_loop_alpha;
+        beta = pre_loop_beta;
+        gamma = pre_loop_gamma;
     }
 }
