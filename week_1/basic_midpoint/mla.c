@@ -180,51 +180,79 @@ x = y0;
     else if (slope < - 1 && x1 < x0)
     {
       
-        x = x0;
+// if dx < dy)
+       y = x0;
+        double temp = x0;
+        x0 = y0;
+        y0 = temp;
+        temp = x1;
+        x1 = y1;
+        y1 = temp;
 
-        printf("slope %f \n", slope);
-        double d =  ((x0 - x1) * (y0 + 1) + (y1 - y0) * (x0 - 0.5) + y0 * x1 - y1 * x0);
 
-        for(y = y0 ; y < y1; y++)
+
+
+  double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+
+        for(x = x0 ; x < x1; x++)
         {
-            PutPixel(s,x,y,colour);
+
+            PutPixel(s,y,x,colour);
             if( d > 0)
             {
-                x = x - 1;
-                d = d + (y0 - y1) + (x0 - x1);
+                y = y - 1;
+                d = d + (x0 - x1) + (y0 - y1);
 
             }
             else
             {
-                d = d + (x0 - x1);
+                d = d + (y0 - y1);
             }
 
         }
+        PutPixel(s,y1,x1, colour);
 
+
+
+
+
+
+      
     }
     //octant 7 works almost x0 < x1, y1 < y0 ,dx < dy
     else if (slope <= - 1 && x1 > x0) 
     {
-        printf("slope = %f", slope);
-             x = x0;
 
-        double d =  ((x0 - x1) * (y0 + 1) + (y1 - y0) * (x0 + 0.5) + y0 * x1 - y1 * x0);
+    // if dx < dy)
+       y = x0;
+        double temp = x0;
+        x0 = y0;
+        y0 = temp;
+        temp = x1;
+        x1 = y1;
+        y1 = temp;
 
-        for(y = y0 ; y > y1; y--)
+
+ double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+
+        for(x = x0 ; x > x1; x--)
         {
-            PutPixel(s,x,y,colour);
+
+            PutPixel(s,y,x,colour);
             if( d < 0)
             {
-                x = x + 1;
-                d = d + (y0 - y1) + (x0 - x1);
+                y = y + 1;
+                d = d + (x0 - x1) + (y0 - y1);
 
             }
             else
             {
-                d = d + (x0 - x1);
+                d = d + (y0 - y1);
             }
 
         }
+        PutPixel(s,y1,x1, colour);
+
     }
 
 
