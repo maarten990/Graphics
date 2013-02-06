@@ -86,13 +86,6 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
   // In case slope is between 1 and infinity
   else if (slope > 1){
       
-      /*
-  double temp = y0;
-  y0 = x0;
-  x0 = temp;
-  temp = y1;
-  y1 = x1; 
-  x1 = temp;*/
   printf("here\n");
   printf("x1-x0: %d\n", x1-x0);
   printf("y0-y1: %d\n", y0-y1);
