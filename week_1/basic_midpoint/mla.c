@@ -136,7 +136,7 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
         }
 
     }
-    // Octant 6
+    // Octant 6 works  x1 > x0, y1 > y0
     else if (slope >= 1 && y1 < y0)
     {
 
@@ -162,8 +162,38 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
         }
 
 
+    }
 
 
+   
+    //octant 3 works
+    else if (slope < - 1 && x1 < x0)
+    {
+      
+        x = x0;
+
+        double d =  ((x0 - x1) * (y0 + 1) + (y1 - y0) * (x0 - 0.5) + y0 * x1 - y1 * x0);
+
+        for(y = y0 ; y < y1; y++)
+        {
+            PutPixel(s,x,y,colour);
+            if( d > 0)
+            {
+                x = x - 1;
+                d = d + (y0 - y1) + (x0 - x1);
+
+            }
+            else
+            {
+                d = d + (x0 - x1);
+            }
+
+        }
+
+    }
+    else if (slope < - && x1 >x 0) 
+    {
+        
     }
 
 
@@ -216,7 +246,6 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
         PutPixel(s,x1,y1, colour);
 
     }
-
 
     return;
 }
