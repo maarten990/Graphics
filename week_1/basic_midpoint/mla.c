@@ -34,20 +34,18 @@
  *
  */
 void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
-
-
-    printf("here\n");   
-
     // Slope
     double slope;
-    // The additional y value for the line
-    double addition;
 
+    if(x1 == x0 && x1> x0)
+    {
+        slope = 1000;
+    }
+    else{  
     slope = (y1 - y0) / (double)(x1 - x0);
-    addition = y0 - (slope * x0);
+    }
     // Put pixels at the end and beginning
-    printf("The slope: %f", slope);
-    printf("The addition: %f", addition);
+    printf("The slope: %f\n", slope);
     PutPixel(s,x0,y0,colour);
     PutPixel(s,x1,y1,colour);
 
@@ -84,7 +82,7 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
     else if(slope >= 0 && slope <1 && x1 < x0)
     {
 
-        double d =  ((y0 - y1) * (x0 - 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+        double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
 
         for(x = x0 ; x > x1; x--)
         {
@@ -143,7 +141,7 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
 
         x = x0;
 
-        double d =  ((x0 - x1) * (y0 - 1) + (y1 - y0) * (x0 - 0.5) + y0 * x1 - y1 * x0);
+        double d =  ((x0 - x1) * (y0 + 1) + (y1 - y0) * (x0 + 0.5) + y0 * x1 - y1 * x0);
 
         for(y = y0 ; y > y1; y--)
         {
@@ -172,6 +170,7 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
       
         x = x0;
 
+        printf("slope %f \n", slope);
         double d =  ((x0 - x1) * (y0 + 1) + (y1 - y0) * (x0 - 0.5) + y0 * x1 - y1 * x0);
 
         for(y = y0 ; y < y1; y++)
@@ -191,9 +190,29 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
         }
 
     }
-    else if (slope < - && x1 >x 0) 
+    //octant 7 works almost
+    else if (slope <= - 1 && x1 > x0) 
     {
-        
+        printf("slope = %f", slope);
+             x = x0;
+
+        double d =  ((x0 - x1) * (y0 + 1) + (y1 - y0) * (x0 + 0.5) + y0 * x1 - y1 * x0);
+
+        for(y = y0 ; y > y1; y--)
+        {
+            PutPixel(s,x,y,colour);
+            if( d < 0)
+            {
+                x = x + 1;
+                d = d + (y0 - y1) + (x0 - x1);
+
+            }
+            else
+            {
+                d = d + (x0 - x1);
+            }
+
+        }
     }
 
 
@@ -225,7 +244,7 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
     else if(slope >= -1 && slope < 0 && x1 < x0)
     {
 
-    double d =  ((y0 - y1) * (x0 - 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
+    double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
 
         for(x = x0 ; x > x1; x--)
         {
