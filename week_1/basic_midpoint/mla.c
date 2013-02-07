@@ -352,7 +352,7 @@ if(x1 < x0)
 
         printf( "octant 4\n" );
 
-        double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+        double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
 
         for(x = x0 ; x < x1; x++)
         {
