@@ -113,6 +113,15 @@ else if(y1 < y0)
     {
         printf( "octant 5\n" );
 
+
+
+
+
+
+
+
+
+
         double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
 
         for(x = x0 ; x > x1; x--)
@@ -141,6 +150,7 @@ else if(y1 < y0)
 
         printf( "octant 2\n" );
 
+        double increment = 1;
     if(dx < dy || dx == 0)
         {
             x = y0;
@@ -152,7 +162,22 @@ else if(y1 < y0)
             x1 = y1;
             y1 = temp;
         }
+if(x1 < x0)
+{
+    double temp = x1;
+    x1 = x0;
+    x0 = temp;
+    y = y1;
+    if(y1 > y0)
+    {
+        increment = -1;
+    } 
 
+}
+else if(y1 < y0)
+    {
+        increment = -1;
+    } 
 
        
         double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
@@ -165,7 +190,7 @@ else if(y1 < y0)
             PutPixel(s,y,x,colour);
             if( d < 0)
             {
-                y = y + 1;
+                y = y + increment;
                 d = d + (x1 - x0) + (y0 - y1);
 
             }
