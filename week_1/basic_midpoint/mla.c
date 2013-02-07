@@ -282,8 +282,9 @@ else if(y1 < y0)
 
     //octant 3 works x1 < x0, y0 < y1, dx < dy
     else if (slope < - 1 && x1 < x0)
-    {
+    { 
         
+    double increment = 1;
     if(dx < dy || dx == 0)
         {
             x = y0;
@@ -296,6 +297,22 @@ else if(y1 < y0)
             y1 = temp;
         }
 
+if(x1 < x0)
+{
+    double temp = x1;
+    x1 = x0;
+    x0 = temp;
+    y = y1;
+    if(y1 > y0)
+    {
+        increment = -1;
+    } 
+
+}
+else if(y1 < y0)
+    {
+        increment = -1;
+    } 
         printf( "octant 3\n" );
 
 
@@ -307,7 +324,7 @@ else if(y1 < y0)
             PutPixel(s,y,x,colour);
             if( d > 0)
             {
-                y = y - 1;
+                y = y + increment;
                 d = d + (x0 - x1) + (y0 - y1);
 
             }
@@ -317,7 +334,7 @@ else if(y1 < y0)
             }
 
         }
-        PutPixel(s,y1,x1, colour);
+        PutPixel(s,y0,x1, colour);
 
     }
     //octant 7 works almost x0 < x1, y1 < y0 ,dx < dy
