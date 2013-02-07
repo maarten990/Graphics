@@ -4,12 +4,18 @@
  * Description ..... Midpoint Line Algorithm
  * Created by ...... Jurgen Sturm 
  *
- * Student name ....
- * Student email ... 
- * Collegekaart ....
- * Date ............
+ * Student name .... Inge Becht
+ * Student email ... inge.becht91@gmail.com
+ * Collegekaart .... 6093906
+ * Date ............ 07-02-2013
  * Comments ........
  *
+ *
+ * Student name .... Maarten de Jonge
+ * Student email ... mdejonge1990@gmail.com
+ * Collegekaart .... 6286658
+ * Date ............ 07-02-2013
+ * Comments ........
  *
  * (always fill in these fields before submitting!!)
  */
@@ -34,38 +40,46 @@
  *
  */
 void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
-    // Slope
+    // Slope used for octant choice
     double slope;
 
-    if(x1 == x0 && x1> x0)
+    // Create artificial slope for the cases of -inf and inf
+    if((x1 == x0) && (y1 < y0))
     {
-        slope = 1000;
+        slope = -2;
+    }
+    else if((x1 == x0) && (y0 < y1))
+    {
+        slope = 2;
     }
     else{  
-    slope = (y1 - y0) / (double)(x1 - x0);
-    }
-    // Put pixels at the end and beginning
-    printf("The slope: %f\n", slope);
-    PutPixel(s,x0,y0,colour);
-    PutPixel(s,x1,y1,colour);
 
+        // Standard slope calculation
+        slope = (y1 - y0) / (double)(x1 - x0);
+    }
+
+    // create iteration variables
     int x;
     int y = y0;
 
 
     // octant 1 works: x0 < x1, y0 < y1, dy < dx
-    if(slope >= 0 && slope < 1 && x1 > x0)
+    if(slope >= 0 && slope <= 1 && x1 > x0)
     {
         double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
 
 
 
-        for(x = x0 ; x < x1; x++)
+        // Loop through all the pixel in the longest direction
+        for(x = x0 ; x <= x1; x++)
         {
 
+            // Place the pixel 
             PutPixel(s,x,y,colour);
+            // In  case the point is lower than the line segment at the point
             if( d < 0)
             {
+                // Move y up, increment d value
                 y = y + 1;
                 d = d + (x1 - x0) + (y0 - y1);
 
@@ -76,15 +90,14 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
             }
 
         }
-        PutPixel(s,x1,y1, colour);
     }
     // octant 5: x1 < x0, y1 < y0, dy < dx
-    else if(slope >= 0 && slope <1 && x1 < x0)
+    else if(slope >= 0 && slope <= 1 && x1 < x0)
     {
 
         double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
 
-        for(x = x0 ; x > x1; x--)
+        for(x = x0 ; x >= x1; x--)
         {
 
             PutPixel(s,x,y,colour);
@@ -100,19 +113,12 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
             }
 
         }
-        PutPixel(s,x1,y1, colour);
-
-
-
-
     }
-
-
-
     // Octant 2 works x0 < x1, y0 < y1, dx<dy
-    else if (slope >= 1 && y1 > y0){
-        x = x0;
+    else if (slope > 1 && y1 > y0){
 
+        x = x0;
+        // Distance between y0 and  y1 is bigger than x1 and x0 so swap x and y
         double d =  ((x0 - x1) * (y0 + 1) + (y1 - y0) * (x0 + 0.5) + y0 * x1 - y1 * x0);
 
         for(y = y0 ; y < y1; y++)
@@ -128,20 +134,16 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
             {
                 d = d + (x0 - x1);
             }
-
         }
-
     }
     // Octant 6 works  x1 > x0, y1 > y0 , dx < dy
-    else if (slope >= 1 && y1 < y0)
+    else if (slope > 1 && y1 <= y0  )
     {
-
-
+        printf("slope = %f\n", slope);
         x = x0;
-
         double d =  ((x0 - x1) * (y0 + 1) + (y1 - y0) * (x0 + 0.5) + y0 * x1 - y1 * x0);
 
-        for(y = y0 ; y > y1; y--)
+        for(y = y0 ; y >= y1; y--)
         {
             PutPixel(s,x,y,colour);
             if( d > 0)
@@ -154,29 +156,24 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
             {
                 d = d + (x0 - x1);
             }
-
         }
-
-
     }
 
-
-   
     //octant 3 works x1 < x0, y0 < y1, dx < dy
     else if (slope < - 1 && x1 < x0)
     {
-      
-        x = x0;
 
-        printf("slope %f \n", slope);
+        x = x0;
+        // x1 is lower than x0 and dy > dx so again we iterate over y
         double d =  ((x0 - x1) * (y0 + 1) + (y1 - y0) * (x0 - 0.5) + y0 * x1 - y1 * x0);
 
-        for(y = y0 ; y < y1; y++)
+        for(y = y0 ; y <= y1; y++)
         {
             PutPixel(s,x,y,colour);
             if( d > 0)
             {
                 x = x - 1;
+                // Change sequence because of x1 < x0
                 d = d + (y0 - y1) + (x0 - x1);
 
             }
@@ -184,19 +181,19 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
             {
                 d = d + (x0 - x1);
             }
-
         }
-
     }
+
     //octant 7 works almost x0 < x1, y1 < y0 ,dx < dy
-    else if (slope <= - 1 && x1 > x0) 
+    else if (slope <= - 1 && x1 >= x0) 
     {
         printf("slope = %f", slope);
-             x = x0;
+        x = x0;
 
+        // iterate over y because of dx < dy
         double d =  ((x0 - x1) * (y0 + 1) + (y1 - y0) * (x0 - 0.5) + y0 * x1 - y1 * x0);
 
-        for(y = y0 ; y > y1; y--)
+        for(y = y0 ; y >= y1; y--)
         {
             PutPixel(s,x,y,colour);
             if( d < 0)
@@ -209,18 +206,16 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
             {
                 d = d + (x0 - x1);
             }
-
         }
     }
 
-
     // octant 8 Works x0 < x1, y1 < y0 dy < dx
-    else if(slope >= -1 && slope < 0 && x1 > x0)
+    else if(slope >= -1 && slope <= 0 && x1 > x0)
     {
 
-    double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+        double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
 
-        for(x = x0 ; x < x1; x++)
+        for(x = x0 ; x <= x1; x++)
         {
 
             PutPixel(s,x,y,colour);
@@ -236,15 +231,14 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
             }
 
         }
-        PutPixel(s,x1,y1, colour);
     }
     // Octant 4 works: x1 < x0, y0 < y1 dy < dx
-    else if(slope >= -1 && slope < 0 && x1 < x0)
+    else if(slope >= -1 && slope <= 0 && x1 < x0)
     {
 
-    double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+        double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
 
-        for(x = x0 ; x > x1; x--)
+        for(x = x0 ; x >= x1; x--)
         {
 
             PutPixel(s,x,y,colour);
@@ -258,9 +252,7 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
             {
                 d = d + (y0 - y1);
             }
-
         }
-        PutPixel(s,x1,y1, colour);
 
     }
 
