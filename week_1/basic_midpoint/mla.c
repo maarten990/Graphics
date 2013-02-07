@@ -68,7 +68,7 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
     // octant 1 works: x0 < x1, y0 < y1, dy < dx
     if(slope >= 0 && slope <= 1 && x1 > x0)
     {
-
+    
         double d = 0;
         printf( "octant 1\n" );
         if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
@@ -535,6 +535,7 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
         printf( "octant 1\n" );
         if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
         {  d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
+
         } else { 
 
             d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
