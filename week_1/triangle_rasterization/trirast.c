@@ -98,7 +98,11 @@ draw_triangle(float x0, float y0, float x1, float y1, float x2, float y2,
             gamma = line(x0, y0, x1, y1, x, y) / line(x0, y0, x1, y1, x2, y2);
 
             if ((alpha >= 0) && (beta >= 0) && (gamma >= 0)) {
-                PutPixel(x, y, r, g, b);
+                if ((alpha > 0 || (line(x1, y1, x2, y2, x0, y0) * line(x1, y1, x2, y2, -1, -1) > 0))
+                    && (beta > 0 || (line(x2, y2, x0, y0, x1, y1) * line(x2, y2, x0, y0, -1, -1) > 0))
+                    && (gamma > 0 || (line(x0, y0, x1, y1, x2, y2) * line(x0, y0, x1, y1, -1, -1) > 0))) {
+                    PutPixel(x, y, r, g, b);
+                }
             }
         }
     }
@@ -147,7 +151,11 @@ draw_triangle_optimized(float x0, float y0, float x1, float y1, float x2, float 
             gamma += (x1 - x0) / gamma_numerator;
 
             if ((alpha >= 0) && (beta >= 0) && (gamma >= 0)) {
-                PutPixel(x, y, r, g, b);
+                if ((alpha > 0 || (alpha_numerator * line(x1, y1, x2, y2, -1, -1)) > 0)
+                    && (beta > 0 || (beta_numerator * line(x2, y2, x0, y0, -1, -1)) > 0)
+                    && (gamma > 0 || (gamma_numerator * line(x0, y0, x1, y1, -1, -1)) > 0)) {
+                    PutPixel(x, y, r, g, b);
+                }
             }
         }
 
