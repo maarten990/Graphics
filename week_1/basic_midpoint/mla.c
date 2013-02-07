@@ -68,8 +68,16 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
     // octant 1 works: x0 < x1, y0 < y1, dy < dx
     if(slope >= 0 && slope <= 1 && x1 > x0)
     {
+
+        double d = 0;
         printf( "octant 1\n" );
-        double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
+        if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
+        {  d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
+        } else { 
+
+            d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+
+        }
         int  increment = 1;
         if(x1 < x0)
         {
@@ -134,7 +142,15 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
 
 
 
-        double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+        double d = 0;
+        printf( "octant 1\n" );
+        if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
+        {  d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
+        } else { 
+
+            d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+
+        }
 
         for(x = x0 ; x <= x1; x++)
         {
@@ -152,7 +168,6 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
             }
 
         }
-        PutPixel(s,x1,y1, colour);
 
     }
 
@@ -192,8 +207,15 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
         } 
 
 
-        double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
+        double d = 0;
+        printf( "octant 1\n" );
+        if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
+        {  d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
+        } else { 
 
+            d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+
+        }
 
 
         for(x = x0 ; x <= x1; x++)
@@ -212,7 +234,6 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
             }
 
         }
-        PutPixel(s,y1,x1, colour);
 
 
     }
@@ -255,9 +276,15 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
 
         printf( "octant 6\n" );
 
-        double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+        double d = 0;
+        printf( "octant 1\n" );
+        if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
+        {  d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
+        } else { 
 
-        for(x = x0 ; x <= x1; x++)
+            d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+
+        }        for(x = x0 ; x <= x1; x++)
         {
 
             PutPixel(s,y,x,colour);
@@ -273,7 +300,6 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
             }
 
         }
-        PutPixel(s,y1,x1, colour);
 
 
     }
@@ -316,8 +342,15 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
         printf( "octant 3\n" );
 
 
-        double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+        double d = 0;
+        printf( "octant 1\n" );
+        if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
+        {  d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
+        } else { 
 
+            d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+
+        }       
         for(x = x0 ; x <= x1; x++)
         {
 
@@ -334,7 +367,6 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
             }
 
         }
-       // PutPixel(s,y0,x1, colour);
 
     }
     //octant 7 works almost x0 < x1, y1 < y0 ,dx < dy
@@ -374,7 +406,15 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
             increment = -1;
         } 
 
-        double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
+        double d = 0;
+        printf( "octant 1\n" );
+        if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
+        {  d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
+        } else { 
+
+            d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+
+        }       
 
         for(x = x0 ; x <= x1; x++)
         {
@@ -431,7 +471,15 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
 
         printf( "octant 8\n" );
 
-        double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+        double d = 0;
+        printf( "octant 1\n" );
+        if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
+        {  d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
+        } else { 
+
+            d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+
+        }   
 
         for(x = x0 ; x <= x1; x++)
         {
@@ -483,7 +531,17 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
 
         printf( "octant 4\n" );
 
-        double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
+        double d = 0;
+        printf( "octant 1\n" );
+        if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
+        {  d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
+        } else { 
+
+            d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
+
+        }   
+
+
 
         for(x = x0 ; x <= x1; x++)
         {
