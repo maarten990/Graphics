@@ -33,77 +33,40 @@
  *
  *
  */
-
-int bigger(double d, int x)
-{
-    return d > x;
-}
-
-
-int smaller(double d, int x)
-{
-    return d < x;
-}
-
 void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
     // Slope
     double slope;
 
-    if(x1 == x0 && y1< y0)
+    if(x1 == x0 && x1> x0)
     {
-        slope = 2;
+        slope = 1000;
     }
     else{  
-        slope = (y1 - y0) / (double)(x1 - x0);
+    slope = (y1 - y0) / (double)(x1 - x0);
     }
     // Put pixels at the end and beginning
-    //printf("The slope: %f\n", slope);
+    printf("The slope: %f\n", slope);
+    PutPixel(s,x0,y0,colour);
+    PutPixel(s,x1,y1,colour);
 
     int x;
     int y = y0;
-    double dx = abs(x1 - x0);
-    double dy = abs(y1 - y0);
 
 
     // octant 1 works: x0 < x1, y0 < y1, dy < dx
-    if(slope >= 0 && slope <= 1 && x1 > x0)
+    if(slope >= 0 && slope < 1 && x1 > x0)
     {
-    
-        double d = 0;
-        printf( "octant 1\n" );
-        if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
-        {  d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
-        } else { 
+        double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
 
-            d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
 
-        }
-        int  increment = 1;
-        if(x1 < x0)
+
+        for(x = x0 ; x < x1; x++)
         {
-            double temp = x1;
-            x1 = x0;
-            x0 = temp;
-            y = y1;
-            if(y1 > y0)
-            {
-                increment = -1;
-            } 
-
-        }
-        else if(y1 < y0)
-        {
-            increment = -1;
-        } 
-
-        for(x = x0 ; x <= x1; x++)
-        {
-
 
             PutPixel(s,x,y,colour);
             if( d < 0)
             {
-                y = y + increment;
+                y = y + 1;
                 d = d + (x1 - x0) + (y0 - y1);
 
             }
@@ -115,116 +78,19 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
         }
         PutPixel(s,x1,y1, colour);
     }
-
     // octant 5: x1 < x0, y1 < y0, dy < dx
-    else if(slope >= 0 && slope <= 1 && x1 < x0)
+    else if(slope >= 0 && slope <1 && x1 < x0)
     {
-        printf( "octant 5\n" );
 
+        double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
 
-        int  increment = 1;
-        if(x1 < x0)
-        {
-            double temp = x1;
-            x1 = x0;
-            x0 = temp;
-            y = y1;
-            if(y1 > y0)
-            {
-                increment = -1;
-            } 
-
-        }
-        else if(y1 < y0)
-        {
-            increment = -1;
-        } 
-
-
-
-        double d = 0;
-        printf( "octant 1\n" );
-        if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
-        {  d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
-        } else { 
-
-            d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
-
-        }
-
-        for(x = x0 ; x <= x1; x++)
+        for(x = x0 ; x > x1; x--)
         {
 
             PutPixel(s,x,y,colour);
             if( d > 0)
             {
-                y = y + increment;
-                d = d + (x0 - x1) + (y0 - y1);
-
-            }
-            else
-            {
-                d = d + (y0 - y1);
-            }
-
-        }
-
-    }
-
-
-    // Octant 2 works x0 < x1, y0 < y1, dx<dy
-    else if (slope >= 1 && y1 > y0){
-
-        printf( "octant 2\n" );
-
-        double increment = 1;
-        if(dx < dy || dx == 0)
-        {
-            x = y0;
-            y = x0;
-            double temp = x0;
-            x0 = y0;
-            y0 = temp;
-            temp = x1;
-            x1 = y1;
-            y1 = temp;
-        }
-        if(x1 < x0)
-        {
-            double temp = x1;
-            x1 = x0;
-            x0 = temp;
-            y = y1;
-            if(y1 > y0)
-            {
-                increment = -1;
-            } 
-
-        }
-        else if(y1 < y0)
-        {
-            increment = -1;
-        } 
-
-
-        double d = 0;
-        printf( "octant 1\n" );
-        if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
-        {  d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
-        } else { 
-
-            d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
-
-        }
-
-
-        for(x = x0 ; x <= x1; x++)
-        {
-
-            PutPixel(s,y,x,colour);
-            if( d < 0)
-            {
-                y = y + increment;
+                y = y - 1;
                 d = d + (x1 - x0) + (y0 - y1);
 
             }
@@ -234,69 +100,59 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
             }
 
         }
+        PutPixel(s,x1,y1, colour);
 
+
+
+
+    }
+
+
+
+    // Octant 2 works x0 < x1, y0 < y1, dx<dy
+    else if (slope >= 1 && y1 > y0){
+        x = x0;
+
+        double d =  ((x0 - x1) * (y0 + 1) + (y1 - y0) * (x0 + 0.5) + y0 * x1 - y1 * x0);
+
+        for(y = y0 ; y < y1; y++)
+        {
+            PutPixel(s,x,y,colour);
+            if( d < 0)
+            {
+                x = x + 1;
+                d = d + (y1 - y0) + (x0 - x1);
+
+            }
+            else
+            {
+                d = d + (x0 - x1);
+            }
+
+        }
 
     }
     // Octant 6 works  x1 > x0, y1 > y0 , dx < dy
-    else if (slope > 1 && y1 < y0)
-    { 
+    else if (slope >= 1 && y1 < y0)
+    {
 
 
-        double increment =1;
+        x = x0;
 
+        double d =  ((x0 - x1) * (y0 + 1) + (y1 - y0) * (x0 + 0.5) + y0 * x1 - y1 * x0);
 
-        if(dx < dy || dx == 0)
+        for(y = y0 ; y > y1; y--)
         {
-            x = y0;
-            y = x0;
-            double temp = x0;
-            x0 = y0;
-            y0 = temp;
-            temp = x1;
-            x1 = y1;
-            y1 = temp;
-        }
-
-        if(x1 < x0)
-        {
-            double temp = x1;
-            x1 = x0;
-            x0 = temp;
-            y = y1;
-            if(y1 > y0)
-            {
-                increment = -1;
-            } 
-
-        }
-        else if(y1 < y0)
-        {
-            increment = -1;
-        } 
-
-        printf( "octant 6\n" );
-
-        double d = 0;
-        printf( "octant 1\n" );
-        if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
-        {  d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
-        } else { 
-
-            d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
-
-        }        for(x = x0 ; x <= x1; x++)
-        {
-
-            PutPixel(s,y,x,colour);
+            PutPixel(s,x,y,colour);
             if( d > 0)
             {
-                y = y + increment;
-                d = d + (x0 - x1) + (y0 - y1);
+                x = x - 1;
+                d = d + (y1 - y0) + (x0 - x1);
 
             }
             else
             {
-                d = d + (y0 - y1);
+                d = d + (x0 - x1);
             }
 
         }
@@ -305,189 +161,72 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
     }
 
 
-
+   
     //octant 3 works x1 < x0, y0 < y1, dx < dy
     else if (slope < - 1 && x1 < x0)
-    { 
+    {
+      
+        x = x0;
 
-        double increment = 1;
-        if(dx < dy || dx == 0)
+        printf("slope %f \n", slope);
+        double d =  ((x0 - x1) * (y0 + 1) + (y1 - y0) * (x0 - 0.5) + y0 * x1 - y1 * x0);
+
+        for(y = y0 ; y < y1; y++)
         {
-            x = y0;
-            y = x0;
-            double temp = x0;
-            x0 = y0;
-            y0 = temp;
-            temp = x1;
-            x1 = y1;
-            y1 = temp;
-        }
-
-        if(x1 < x0)
-        {
-            double temp = x1;
-            x1 = x0;
-            x0 = temp;
-            y = y1;
-            if(y1 > y0)
-            {
-                increment = -1;
-            } 
-
-        }
-        else if(y1 < y0)
-        {
-            increment = -1;
-        } 
-        printf( "octant 3\n" );
-
-
-        double d = 0;
-        printf( "octant 1\n" );
-        if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
-        {  d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
-        } else { 
-
-            d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
-
-        }       
-        for(x = x0 ; x <= x1; x++)
-        {
-
-            PutPixel(s,y,x,colour);
+            PutPixel(s,x,y,colour);
             if( d > 0)
             {
-                y = y + increment;
-                d = d + (x0 - x1) + (y0 - y1);
+                x = x - 1;
+                d = d + (y0 - y1) + (x0 - x1);
 
             }
             else
             {
-                d = d + (y0 - y1);
+                d = d + (x0 - x1);
             }
 
         }
 
     }
     //octant 7 works almost x0 < x1, y1 < y0 ,dx < dy
-    else if (slope < - 1 && x1 > x0) 
+    else if (slope <= - 1 && x1 > x0) 
     {
-        printf( "octant 7\n" );
+        printf("slope = %f", slope);
+             x = x0;
 
+        double d =  ((x0 - x1) * (y0 + 1) + (y1 - y0) * (x0 - 0.5) + y0 * x1 - y1 * x0);
 
-        double increment = 1;
-
-
-        if(dx < dy || dx == 0)
+        for(y = y0 ; y > y1; y--)
         {
-            x = y0;
-            y = x0;
-            double temp = x0;
-            x0 = y0;
-            y0 = temp;
-            temp = x1;
-            x1 = y1;
-            y1 = temp;
-        }
-        if(x1 < x0)
-        {
-            double temp = x1;
-            x1 = x0;
-            x0 = temp;
-            y = y1;
-            if(y1 > y0)
-            {
-                increment = -1;
-            } 
-
-        }
-        else if(y1 < y0)
-        {
-            increment = -1;
-        } 
-
-        double d = 0;
-        printf( "octant 1\n" );
-        if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
-        {  d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
-        } else { 
-
-            d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
-
-        }       
-
-        for(x = x0 ; x <= x1; x++)
-        {
-
-            PutPixel(s,y,x,colour);
+            PutPixel(s,x,y,colour);
             if( d < 0)
             {
-                y = y + increment;
-                d = d + (x1 - x0) + (y0 - y1);
+                x = x + 1;
+                d = d + (y0 - y1) + (x0 - x1);
 
             }
             else
             {
-                d = d + (y0 - y1);
+                d = d + (x0 - x1);
             }
 
         }
-
     }
 
 
     // octant 8 Works x0 < x1, y1 < y0 dy < dx
-    else if(slope >= -1 && slope <= 0 && x1 > x0)
+    else if(slope >= -1 && slope < 0 && x1 > x0)
     {
-        double increment = 1;
-        if(dx < dy || dx == 0)
-        {
-            x = y0;
-            y = x0;
-            double temp = x0;
-            x0 = y0;
-            y0 = temp;
-            temp = x1;
-            x1 = y1;
-            y1 = temp;
-        }
-        if(x1 < x0)
-        {
-            double temp = x1;
-            x1 = x0;
-            x0 = temp;
-            y = y1;
-            if(y1 > y0)
-            {
-                increment = -1;
-            } 
 
-        }
-        else if(y1 < y0)
-        {
-            increment = -1;
-        } 
+    double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
 
-
-        printf( "octant 8\n" );
-
-        double d = 0;
-        printf( "octant 1\n" );
-        if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
-        {  d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
-        } else { 
-
-            d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
-
-        }   
-
-        for(x = x0 ; x <= x1; x++)
+        for(x = x0 ; x < x1; x++)
         {
 
             PutPixel(s,x,y,colour);
             if( d > 0)
             {
-                y = y + increment;
+                y = y - 1;
                 d = d + (x0 - x1) + (y0 - y1);
 
             }
@@ -497,61 +236,22 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
             }
 
         }
+        PutPixel(s,x1,y1, colour);
     }
     // Octant 4 works: x1 < x0, y0 < y1 dy < dx
     else if(slope >= -1 && slope < 0 && x1 < x0)
     {
-        //int (*compare)(int, int) = & bigger;
-        double increment = 1;
-        if(dx < dy || dx == 0)
-        {
-            x = y0;
-            y = x0;
-            double temp = x0;
-            x0 = y0;
-            y0 = temp;
-            temp = x1;
-            x1 = y1;
-            y1 = temp;
-        }
 
-        if(x1 < x0)
-        {
-            double temp = x1;
-            x1 = x0;
-            x0 = temp;
-            y = y1;
-            if(y1 > y0)
-            {
-                increment = -1;
-            } 
+    double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
 
-        }
-
-
-        printf( "octant 4\n" );
-
-        double d = 0;
-        printf( "octant 1\n" );
-        if((x0 < x1 && !(y1 < y0 && dy < dx) ) || ( y0 < y1 && dy < dx ))
-        {  d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
-
-        } else { 
-
-            d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 - 0.5) + x0 * y1 - x1 * y0);
-
-        }   
-
-
-
-        for(x = x0 ; x <= x1; x++)
+        for(x = x0 ; x > x1; x--)
         {
 
             PutPixel(s,x,y,colour);
             if( d < 0)
             {
-                y = y + increment;
-                d = d + (x1 - x0) + (y0 - y1);
+                y = y + 1;
+                d = d + (x0 - x1) + (y0 - y1);
 
             }
             else
@@ -560,10 +260,10 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
             }
 
         }
+        PutPixel(s,x1,y1, colour);
 
     }
 
     return;
 }
-
 
