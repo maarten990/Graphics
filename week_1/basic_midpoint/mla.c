@@ -70,8 +70,23 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
     {
         printf( "octant 1\n" );
         double d =  ((y0 - y1) * (x0 + 1) + (x1 - x0) * (y0 + 0.5) + x0 * y1 - x1 * y0);
+int  increment = 1;
+if(x1 < x0)
+{
+    double temp = x1;
+    x1 = x0;
+    x0 = temp;
+    y = y1;
+    if(y1 > y0)
+    {
+        increment = -1;
+    } 
 
-
+}
+else if(y1 < y0)
+    {
+        increment = -1;
+    } 
 
         for(x = x0 ; x < x1; x++)
         {
@@ -80,7 +95,7 @@ void mla(SDL_Surface *s, int x0, int y0, int x1, int y1, Uint32 colour) {
             PutPixel(s,x,y,colour);
             if( d < 0)
             {
-                y = y + 1;
+                y = y + increment;
                 d = d + (x1 - x0) + (y0 - y1);
 
             }
