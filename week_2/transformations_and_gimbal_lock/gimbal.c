@@ -95,15 +95,32 @@ void drawRotatedTeapot(float rotx, float roty, float rotz)
     glEnd();
 }
 
+
+// Teapots are first rotated around x, then y, then z.
+// The third teapots can only rotate on one of its acces, the x axis.
+//
+// If the sequence is changed, from x y z to z y x the third teapot can only
+// rotate over the z axis.
 void drawTeapots(void)
 {
     /* This function is called from DrawGLScene() below */
 
     glPushMatrix();
-
-    drawRotatedTeapot(x_rotation, 0.0, z_rotation);
-
+    glTranslatef(10, 0, 0);
+    drawRotatedTeapot(x_rotation, 90, z_rotation);
     glPopMatrix();
+  glPushMatrix();
+    glTranslatef(5, 0, 0);
+    drawRotatedTeapot(x_rotation, 0, z_rotation);
+    glPopMatrix();
+
+    glPushMatrix();
+    drawRotatedTeapot(x_rotation, 0.0, z_rotation);
+    glPopMatrix();
+
+  
+
+
 }
 
 void DrawGLScene(void)
