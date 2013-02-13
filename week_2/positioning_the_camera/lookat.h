@@ -13,6 +13,8 @@
 void myLookAt(GLdouble eyeX, GLdouble eyeY, GLdouble eyeZ,
               GLdouble centerX, GLdouble centerY, GLdouble centerZ,
               GLdouble upX, GLdouble upY, GLdouble upZ);
+void normalize(GLdouble *v);
+void cross(GLdouble *target, GLdouble *x, GLdouble *y);
 
 
 #endif /* IBS_LOOKAT_H */
