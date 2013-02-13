@@ -50,11 +50,11 @@ void myLookAt(GLdouble eyeX, GLdouble eyeY, GLdouble eyeZ,
               GLdouble centerX, GLdouble centerY, GLdouble centerZ,
               GLdouble upX, GLdouble upY, GLdouble upZ)
 {
-    // first move the camera to the origin
-    glTranslatef(-eyeX, -eyeY, -eyeZ);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 
-    // then perform the coordinate rotation
-    GLdouble cz[3] = {eyeX - centerX, eyeY - centerY, eyeZ - centerZ},
+    // first perform the coordinate system rotation
+    GLdouble cz[3] = {centerX - eyeX, centerY - eyeY, centerZ - eyeZ},
              cx[3],
              cy[3],
              up[3] = {upX, upY, upZ};
@@ -68,14 +68,14 @@ void myLookAt(GLdouble eyeX, GLdouble eyeY, GLdouble eyeZ,
 
     GLfloat M[16] =
     {
-        cx[0], cy[0], cz[0], 0,
-        cx[1], cy[1], cz[1], 0,
-        cx[2], cy[2], cz[2], 0,
+        cx[0], cy[0], -cz[0], 0,
+        cx[1], cy[1], -cz[1], 0,
+        cx[2], cy[2], -cz[2], 0,
         0.0, 0.0, 0.0, 1.0
     };
 
     glMultMatrixf(M);
 
-    // now translate it back
-    glTranslatef(eyeX, eyeY, eyeZ);
+    // then move the camera to the origin
+    glTranslatef(-eyeX, -eyeY, -eyeZ);
 }
