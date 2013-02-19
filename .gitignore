@@ -2,7 +2,8 @@
 .*.swp
 week_1/basic_midpoint/main
 week_1/triangle_rasterization/trirast
-week_3/bezier_curve/singlecurve
-week_3/bezier_curve/multicurve
+week_3/bezier_curves/singlecurve
+week_3/bezier_curves/multicurve
 week_3/orthogonal_projection/main
-
+week_2/Makefile
+week_2/tarfile/
