@@ -5,10 +5,10 @@
  * Date ............ 01.09.2006
  * Created by ...... Jurgen Sturm 
  *
- * Student name ....
- * Student email ... 
- * Collegekaart ....
- * Date ............
+ * Student name .... Inge Becht, Maarten de Jonge
+ * Student email ... inge.becht91@gmail.com mdejonge1990@gmail.com
+ * Collegekaart .... 6093906 6286658
+ * Date ............ 
  * Comments ........
  *
  *
@@ -32,5 +32,36 @@ void myOrtho(GLdouble left,
              GLdouble top,
              GLdouble near,
              GLdouble far) {
+
+    //  The scaling vector
+    GLfloat M[16] =
+    {
+        2/(right - left), 0.0, 0.0, 0.0,
+        0.0, 2/(top -bottom), 0.0, 0.0,
+        0.0, 0.0, -2 /(far - near), 0.0,
+        0.0, 0.0, 0.0, 1.0
+    };
+
+    glMultMatrixf(M);
+
+
+  // first translate to the origin
+    GLfloat T[16] =
+    {
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        // final column
+        -0.5 * (left + right),
+        -0.5 * (bottom + top),
+        -0.5 * (near + far),
+        1
+    };
+
+    glMultMatrixf(T);
+ //   glMultMatrixf(N);
+
+
+    
 
 }
