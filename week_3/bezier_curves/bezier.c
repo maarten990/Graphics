@@ -60,9 +60,15 @@ evaluate_bezier_curve(float *x, float *y, control_point p[], int num_points, flo
 
     // the result is a summation of Bernstein polynomials over each control
     // point
-    for (int i = 0; i < num_points; ++i) {
-        *x += bernstein(i, num_points, u) * p[i].x;
-        *y += bernstein(i, num_points, u) * p[i].y;
+    for (int i = 0; i < num_points; i++) {
+        if(num_points == 2)
+        {
+            printf("px = %f, pz = %f\n", p[i].x, p[i].y);
+            printf("u = %f\n", u);
+            printf("i = %f\n", i);
+        }
+        *x += bernstein(i, num_points-1, u) * p[i].x;
+        *y += bernstein(i, num_points-1, u) * p[i].y;
     }
 }
 
@@ -98,6 +104,8 @@ draw_bezier_curve(int num_segments, control_point p[], int num_points)
 
     for (float u = 0; u <= 1.0; u += stepsize) {
         evaluate_bezier_curve(&x, &y, p, num_points, u);
+        if(num_points == 2 && num_segments == 2)
+           printf("x = %f, z = %f\n", x, y);
         glVertex2f(x, y);
     }
 
