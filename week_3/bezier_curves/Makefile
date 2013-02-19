@@ -1,14 +1,16 @@
 CC=gcc
 CXX=g++
 
+ARCH := $(shell getconf LONG_BIT)
+
 #BULLET=./bullet32
-BULLET=./bullet64
+BULLET=./bullet$(ARCH)
 #BULLET=./bullet64MAC
 
 WARNING_FLAGS=-Wall -Wextra -Werror-implicit-function-declaration -Wshadow -Wstrict-prototypes -pedantic
 CFLAGS=-g -O2 -std=c99 $(WARNING_FLAGS) -fno-strict-aliasing
 CXXFLAGS=-g -O2 -W -Wall -I${BULLET}/include
-LDFLAGS=-g -lGL -lglut -lGLU -L${BULLET}/lib
+LDFLAGS=-g -lm -lGL -lglut -lGLU -L${BULLET}/lib
 LIBS=-lBulletDynamics -lBulletCollision -lLinearMath
 
 .c.o:
