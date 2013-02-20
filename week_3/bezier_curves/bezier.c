@@ -18,6 +18,8 @@
 #include "bezier.h"
 #include <stdio.h>
 
+#define INTERSECT_TOLERANCE 0.001
+
 // Returns the factorial of n.
 long factorial(int n)
 {
@@ -104,15 +106,53 @@ draw_bezier_curve(int num_segments, control_point p[], int num_points)
     glEnd();
 }
 
+
+/* Returns >0 if the two floats are within the tolerance of eachother,
+ * otherwise 0. */
+int
+close_enough(float x, float target, float tolerance)
+{
+    return ((x < target + tolerance) && (x > target - tolerance)) ? 1 : 0;
+}
+
 /* Find the intersection of a cubic Bezier curve with the line X=x.
    Return 1 if an intersection was found and place the corresponding y
    value in *y.
    Return 0 if no intersection exists.
 */
-
 int
 intersect_cubic_bezier_curve(float *y, control_point p[], float x)
 {
+    int num_points = 4;
+
+    /* u represents the position along the curve (interval [0, 1])
+     * cx and cy hold the x and y coordinates corresponding to a value of u
+     */
+    float u  = 0,
+          cx = 0,
+          cy = 0;
+
+    // because the curves are restricted to act as functions, we can apply
+    // binary search
+    float min = 0;
+    float max = 1;
+
+    // loop until the max and min values get too close for our liking
+    while ( !close_enough(max, min, INTERSECT_TOLERANCE) ) {
+        u = (max + min) / 2;
+        evaluate_bezier_curve(&cx, &cy, p, num_points, u);
+
+        if (close_enough(cx, x, INTERSECT_TOLERANCE)) {
+            *y = cy;
+            return 1;
+        }
+
+        if (cx > x)
+            max = u;
+        else
+            min = u;
+    }
+
     return 0;
 }
 
