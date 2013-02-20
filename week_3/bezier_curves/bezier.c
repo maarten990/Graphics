@@ -106,6 +106,34 @@ draw_bezier_curve(int num_segments, control_point p[], int num_points)
     glEnd();
 }
 
+// Returns smallest x value
+float min_x(control_point p[], int num_points)
+{
+    float smallest = p[0].x;
+    for(int i = 1; i < num_points; i ++)
+    {
+        if(p[i].x < smallest)
+        {
+            smallest = p[i].x;
+        }
+    }
+    return smallest;
+}
+
+// Returns largest x value
+float max_x(control_point p[], int num_points)
+{
+    float biggest = p[0].x;
+    for(int i = 1; i < num_points; i ++)
+    {
+        if(p[i].x > biggest)
+        {
+            biggest = p[i].x;
+        }
+
+    }
+    return biggest;
+}
 
 /* Returns >0 if the two floats are within the tolerance of eachother,
  * otherwise 0. */
@@ -124,6 +152,21 @@ int
 intersect_cubic_bezier_curve(float *y, control_point p[], float x)
 {
     int num_points = 4;
+      // check if x is within convex hull
+      float minx = min_x(p, num_points);
+      float maxx = max_x(p, num_points);
+
+
+      // if in first or last set of control points
+      if((minx > 10 && maxx <= 20) || (minx >= 0 && maxx < 5))
+      {
+          // If not inside return false
+          if (x < minx || x > maxx)
+          {
+              //*y = 0;
+              return 0;
+          }
+      }
 
     /* u represents the position along the curve (interval [0, 1])
      * cx and cy hold the x and y coordinates corresponding to a value of u
