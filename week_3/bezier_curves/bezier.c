@@ -152,21 +152,38 @@ int
 intersect_cubic_bezier_curve(float *y, control_point p[], float x)
 {
     int num_points = 4;
-      // check if x is within convex hull
-      float minx = min_x(p, num_points);
-      float maxx = max_x(p, num_points);
 
+    
+    // check if x is within convex hull
+    float minx = min_x(p, num_points);
+    float maxx = max_x(p, num_points);
 
-      // if in first or last set of control points
-      if((minx > 10 && maxx <= 20) || (minx >= 0 && maxx < 5))
-      {
-          // If not inside return false
-          if (x < minx || x > maxx)
-          {
-              //*y = 0;
-              return 0;
-          }
-      }
+    // Case of x at first quadratic step
+    if(x >= 0 && x <= 2)
+    {
+        if(minx >= 0 && maxx < 5)
+        {
+            // If not inside return false
+            if (x < minx || x > maxx)
+            {
+                return 0;
+            }
+        }
+    }
+    // Case of x at last quadratic step
+    if(x >= 16  && x <= 20)
+    {
+        if(minx > 10  && maxx <= 20)
+        {
+
+            // If not inside return false
+            if (x < minx || x > maxx)
+            {
+                return 0;
+            }
+        }
+    }
+
 
     /* u represents the position along the curve (interval [0, 1])
      * cx and cy hold the x and y coordinates corresponding to a value of u
