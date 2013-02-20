@@ -17,5 +17,6 @@ int     intersect_cubic_bezier_curve(float *y, control_point p[], float x);
 long    factorial(int n);
 float   bernstein(int i, int n, float u);
 int     close_enough(float x, float target, float tolerance);
+int     inside_bounding_box(float x, control_point p[], int num_points);
 
 #endif
