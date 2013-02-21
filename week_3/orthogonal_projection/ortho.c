@@ -31,7 +31,10 @@ void myOrtho(GLdouble left,
              GLdouble bottom,
              GLdouble top,
              GLdouble near,
-             GLdouble far) {
+             GLdouble far)
+{
+    // load the projection matrix
+    glMatrixMode(GL_PROJECTION);
 
     // Scale it down to a 2x2x2 cube
     GLfloat M[16] =
