@@ -33,7 +33,7 @@ void myOrtho(GLdouble left,
              GLdouble near,
              GLdouble far) {
 
-    //  The scaling vector
+    // Scale it down to a 2x2x2 cube
     GLfloat M[16] =
     {
         2/(right - left), 0.0, 0.0, 0.0,
@@ -42,10 +42,8 @@ void myOrtho(GLdouble left,
         0.0, 0.0, 0.0, 1.0
     };
 
-    glMultMatrixf(M);
 
-
-  // first translate to the origin
+    // translation to the origin
     GLfloat T[16] =
     {
         1, 0, 0, 0,
@@ -58,10 +56,7 @@ void myOrtho(GLdouble left,
         1
     };
 
+    // first translate, then scale
+    glMultMatrixf(M);
     glMultMatrixf(T);
- //   glMultMatrixf(N);
-
-
-    
-
 }
