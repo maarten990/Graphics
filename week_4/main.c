@@ -189,8 +189,8 @@ ray_trace(void)
     // the borders of the image plane in camera coordinates
     float left = -(image_plane_width / 2),
           right = image_plane_width / 2,
-          bottom = -(image_plane_height / 2),
-          top = image_plane_height / 2;
+          bottom = (image_plane_height / 2),
+          top = -image_plane_height / 2;
 
     // rays are expressed as a location vector and direction vector
     vec3 ray_origin = v3_create(0, 0, 0),
@@ -209,7 +209,7 @@ ray_trace(void)
             ray_direction = v3_create(-1, u, v);
 
             // Output pixel color
-            color = ray_color(0, ray_origin, ray_direction);
+            color = ray_color(0, scene_camera_position, ray_direction);
             put_pixel(i, j, color.x, color.y, color.z);
         }
 
