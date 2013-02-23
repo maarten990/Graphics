@@ -184,18 +184,28 @@ ray_trace(void)
     image_plane_height = 2.0 * tan(0.5*VFOV/180*M_PI);
     image_plane_width = image_plane_height * (1.0 * framebuffer_width / framebuffer_height);
 
-    // ...
-    // ...
-    // ...
+    GLfloat l, r, b, t, us, vs;
+    vec3 direction;
+    l = 0;
+    r = framebuffer_width;
+    b = 0;
+    t = framebuffer_height;
+    printf(" scene camera position: %f, %f, %f\n\n\n\n\n", scene_camera_position.x, scene_camera_position.y, scene_camera_position.z);
+
 
     // Loop over all pixels in the framebuffer
     for (j = 0; j < framebuffer_height; j++)
     {
         for (i = 0; i < framebuffer_width; i++)
         {
-            // ...
-            // ...
-            // ...
+            
+            us = ( l + (r - l)) * (( i + 0.5)) / framebuffer_width;
+            vs = ( b + (t - b)) * (( j + 0.5)) / framebuffer_height;
+            direction = v3_create(us, vs, 1);
+          if(i == 0 && j == 0)
+          printf(" pixela position: %f, %f, %d\n\n\n\n\n", us, vs, 1); 
+            
+            color = ray_color(0, scene_camera_position, direction );
 
             // Output pixel color
             put_pixel(i, j, color.x, color.y, color.z);
