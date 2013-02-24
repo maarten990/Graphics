@@ -193,7 +193,7 @@ ray_trace(void)
           top = -image_plane_height / 2;
 
     // rays are expressed as a location vector and direction vector
-    vec3 ray_origin = v3_create(0, 0, 0),
+    vec3 ray_origin = scene_camera_position,
          ray_direction;
     float u, v, w;
 
@@ -202,14 +202,18 @@ ray_trace(void)
     {
         for (i = 0; i < framebuffer_width; i++)
         {
+            w = 1;
             u = left + (right - left) * (i + 0.5) / framebuffer_width;
             v = bottom + (top - bottom) * (j + 0.5) / framebuffer_height;
+            //printf("%f, %f\n", u, v);
 
             // compute the direction of the ray through the pixel center
-            ray_direction = v3_create(-1, u, v);
+            ray_direction = v3_add( v3_add(v3_multiply(forward_vector, w), v3_multiply(right_vector, u)),
+                                                    v3_multiply(up_vector, v));
+            ray_direction = v3_normalize(ray_direction);
 
             // Output pixel color
-            color = ray_color(0, scene_camera_position, ray_direction);
+            color = ray_color(0, ray_origin, ray_direction);
             put_pixel(i, j, color.x, color.y, color.z);
         }
 
