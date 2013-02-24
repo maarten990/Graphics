@@ -36,7 +36,35 @@ shade_constant(intersection_point ip)
 vec3
 shade_matte(intersection_point ip)
 {
-    return v3_create(1, 0, 0);
+    /**
+     * Lambertian shading:
+     * L = kd * I * max(0, n dot l)
+     * where L is the resulting color, kd is the diffuse coefficient (surface
+     * color), I is the light intensity, n is the surface normal vector, and l
+     * points towards the light source.
+     */
+
+    // adding the ambient light makes the scene significantly lighter than the
+    // standard OpenGL rendering?
+    float color = scene_ambient_light;
+
+    vec3 l;
+    float angle;
+
+    // loop through each lightsource
+    for (int i = 0; i < scene_num_lights; ++i) {
+        // l = the location of the lightsource - the intersection point
+        // (normalised)
+        l = v3_normalize( v3_subtract(scene_lights[i].position, ip.p) );
+
+        // if the dotproduct is negative, the lightsource is behind the surface
+        angle = v3_dotprod(ip.n, l);
+        angle = angle > 0 ? angle : 0;
+
+        color += ip.material * scene_lights[i].intensity * angle;
+    }
+
+    return v3_create(color, color, color);
 }
 
 vec3
