@@ -41,21 +41,20 @@ shade_matte(intersection_point ip)
      * L = kd * I * max(0, n dot l)
      * where L is the resulting color, kd is the diffuse coefficient (surface
      * color), I is the light intensity, n is the surface normal vector, and l
-     * points towards the light source.
+     * points towards the light source (l = location of lightsource -
+     * intersection point). Make sure every vector involved is normalised.
      */
 
-    // adding the ambient light makes the scene significantly lighter than the
-    // standard OpenGL rendering?
     float color = scene_ambient_light;
-
     vec3 l;
     float angle;
 
     // loop through each lightsource
     for (int i = 0; i < scene_num_lights; ++i) {
-        // l = the location of the lightsource - the intersection point
-        // (normalised)
         l = v3_normalize( v3_subtract(scene_lights[i].position, ip.p) );
+
+        if (shadow_check(v3_multiply(ip.p, 0.001), l))
+            continue;
 
         // if the dotproduct is negative, the lightsource is behind the surface
         angle = v3_dotprod(ip.n, l);
