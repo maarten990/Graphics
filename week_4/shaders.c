@@ -36,7 +36,40 @@ shade_constant(intersection_point ip)
 vec3
 shade_matte(intersection_point ip)
 {
-    return v3_create(1, 0, 0);
+
+    // Normal vector
+    vec3 n = ip.n;
+    n = v3_normalize(n);
+    vec3 l, p2;
+    float spread, r = 0.05, g = 0.05, b = 0.05 ;
+    
+    // iterate trough all lights for final diffused illumination
+    for(int i = 0; i < scene_num_lights; i ++)
+    {
+
+    
+        l = scene_lights[i].position; 
+        l = v3_normalize(l);
+      //  l.x -= ip.p.x;
+      //  l.y -= ip.p.y;
+      //  l.z -= ip.p.z;
+
+     //   l = v3_normalize(l);
+        spread = l.x * n.x + l.y * n.y + l.z * n.z;
+        if(spread < 0)
+        {
+           // pass 
+        }
+        else
+        {
+            r += scene_lights[i].intensity * spread;
+            g += scene_lights[i].intensity * spread;
+            b += scene_lights[i].intensity * spread;
+        }
+
+    }
+
+    return v3_create(r, g, b);
 }
 
 vec3
