@@ -53,7 +53,7 @@ shade_matte(intersection_point ip)
     for (int i = 0; i < scene_num_lights; ++i) {
         l = v3_normalize( v3_subtract(scene_lights[i].position, ip.p) );
 
-        if (shadow_check(v3_multiply(ip.p, 0.001), l))
+        if (shadow_check(v3_multiply(ip.p, 1.05), l))
             continue;
 
         // if the dotproduct is negative, the lightsource is behind the surface
