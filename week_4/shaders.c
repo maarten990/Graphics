@@ -61,7 +61,9 @@ shade_matte(intersection_point ip)
         angle = v3_dotprod(ip.n, l);
         angle = angle > 0 ? angle : 0;
 
-        color += ip.material * scene_lights[i].intensity * angle;
+        // according to the assignment, the material index (ip.material) should
+        // not be used
+        color += scene_lights[i].intensity * angle;
     }
 
     return v3_create(color, color, color);
