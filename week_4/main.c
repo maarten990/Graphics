@@ -184,20 +184,38 @@ ray_trace(void)
     image_plane_height = 2.0 * tan(0.5*VFOV/180*M_PI);
     image_plane_width = image_plane_height * (1.0 * framebuffer_width / framebuffer_height);
 
-    // ...
-    // ...
-    // ...
+    printf("imageplane: (%f, %f)\n", image_plane_width, image_plane_height);
+
+    // the borders of the image plane in camera coordinates
+    float left = -(image_plane_width / 2),
+          right = image_plane_width / 2,
+          bottom = (image_plane_height / 2),
+          top = -image_plane_height / 2;
+
+    // rays are expressed as a location vector and direction vector
+    vec3 ray_origin = scene_camera_position,
+         ray_direction;
+    float u, v, w;
 
     // Loop over all pixels in the framebuffer
     for (j = 0; j < framebuffer_height; j++)
     {
         for (i = 0; i < framebuffer_width; i++)
         {
-            // ...
-            // ...
-            // ...
+            // calculate the [u, v, w] components of the pixel's location
+            // relative to the camera
+            w = 1;
+            u = left + (right - left) * (i + 0.5) / framebuffer_width;
+            v = bottom + (top - bottom) * (j + 0.5) / framebuffer_height;
+
+            // the direction of the ray is a a linear combination of the camera
+            // basisvectors
+            ray_direction = v3_add3(v3_multiply(forward_vector, w),
+                                    v3_multiply(right_vector, u),
+                                    v3_multiply(up_vector, v));
 
             // Output pixel color
+            color = ray_color(0, ray_origin, ray_direction);
             put_pixel(i, j, color.x, color.y, color.z);
         }
 
