@@ -51,8 +51,9 @@ diffuse_term(intersection_point ip, light lsource)
     
     l = v3_normalize( v3_subtract(lsource.position, ip.p) );
 
-    // check the shadow ray
-    if (shadow_check(v3_multiply(ip.p, 1.001), l))
+    // check the shadow ray, starting slightly above the surface to avoid
+    // self-shading
+    if (shadow_check(v3_add(ip.p, v3_multiply(ip.n, 0.01)), l))
         return 0;
 
     // if the dotproduct is negative, the lightsource is behind the surface
@@ -81,8 +82,9 @@ specular_term(intersection_point ip, light lsource, float alpha)
     
     l = v3_normalize( v3_subtract(lsource.position, ip.p) );
 
-    // check the shadow ray
-    if (shadow_check(v3_multiply(ip.p, 1.001), l))
+    // check the shadow ray, starting slightly above the surface to avoid
+    // self-shading
+    if (shadow_check(v3_add(ip.p, v3_multiply(ip.n, 0.01)), l))
         return 0;
 
     // calculate h
