@@ -202,15 +202,17 @@ ray_trace(void)
     {
         for (i = 0; i < framebuffer_width; i++)
         {
+            // calculate the [u, v, w] components of the pixel's location
+            // relative to the camera
             w = 1;
             u = left + (right - left) * (i + 0.5) / framebuffer_width;
             v = bottom + (top - bottom) * (j + 0.5) / framebuffer_height;
-            //printf("%f, %f\n", u, v);
 
-            // compute the direction of the ray through the pixel center
-            ray_direction = v3_add( v3_add(v3_multiply(forward_vector, w), v3_multiply(right_vector, u)),
-                                                    v3_multiply(up_vector, v));
-            ray_direction = v3_normalize(ray_direction);
+            // the direction of the ray is a a linear combination of the camera
+            // basisvectors
+            ray_direction = v3_add3(v3_multiply(forward_vector, w),
+                                    v3_multiply(right_vector, u),
+                                    v3_multiply(up_vector, v));
 
             // Output pixel color
             color = ray_color(0, ray_origin, ray_direction);

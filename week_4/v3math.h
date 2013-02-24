@@ -42,6 +42,17 @@ v3_add(vec3 a,vec3 b)
 	return res;
 }
 
+// Return a + b + c
+static inline vec3
+v3_add3(vec3 a, vec3 b, vec3 c)
+{
+	vec3 res;
+	res.x = a.x + b.x + c.x;
+	res.y = a.y + b.y + c.y;
+	res.z = a.z + b.z + c.z;
+	return res;
+}
+
 // Return a - b
 static inline vec3
 v3_subtract(vec3 a, vec3 b)
