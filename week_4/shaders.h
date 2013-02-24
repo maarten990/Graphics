@@ -8,4 +8,7 @@
 // intersection is found
 vec3    ray_color(int level, vec3 ray_origin, vec3 ray_direction);
 
+float diffuse_term(intersection_point ip, light light);
+float specular_term(intersection_point ip, light lsource, float alpha);
+
 #endif
