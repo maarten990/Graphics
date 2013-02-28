@@ -166,21 +166,70 @@ ray_intersects_sphere(intersection_point* ip, sphere sph,
     return 1;
 }
 
-void check_triangles(intersection_point *ip, bvh_node *node,
+
+int check_triangles(intersection_point *ip, bvh_node *node,
                      vec3 ray_origin, vec3 ray_direction)
 {
     int num_triangles = leaf_node_num_triangles(node);
     triangle *triangles = leaf_node_triangles(node);
     intersection_point temp_ip;
+    int found = 0;
 
-
-    ray_intersects_triangle(ip, triangles[1], ray_origin, ray_direction);
-    for (int i = 1; i < num_triangles; ++i) {
+    for (int i = 0; i < num_triangles; ++i) {
         if (ray_intersects_triangle(&temp_ip, triangles[i], ray_origin, ray_direction)) {
             if (temp_ip.t < ip->t) {
+                found = 1;
                 ray_intersects_triangle(ip, triangles[i], ray_origin, ray_direction);
             }
         }
+    }
+
+    return found;
+}
+
+
+int recursive_bvh(bvh_node *node, intersection_point *ip,
+                  vec3 ray_origin, vec3 ray_direction,
+                  float tmin, float tmax)
+{
+    if (node->is_leaf) {
+        return check_triangles(ip, node, ray_origin, ray_direction);
+    }
+
+    if (!bbox_intersect(&tmin, &tmax, node->bbox, ray_origin, ray_direction, tmin, tmax)) {
+        return 0;
+    }
+
+    bvh_node *left = inner_node_left_child(node);
+    bvh_node *right = inner_node_right_child(node);
+
+    intersection_point left_ip, right_ip;
+    float nearest = 0;
+    int nearest_is_left = -1;
+
+    if (recursive_bvh(left, &left_ip, ray_origin, ray_direction, tmin, tmax)) {
+        if (left_ip.t > 0) {
+            nearest = left_ip.t;
+            nearest_is_left = 1;
+        }
+    }
+
+    if (recursive_bvh(right, &right_ip, ray_origin, ray_direction, tmin, tmax)) {
+        if ((!nearest || right_ip.t < nearest) && right_ip.t > 0) {
+            nearest = right_ip.t;
+            nearest_is_left = 0;
+        }
+    }
+
+    if (nearest_is_left == -1)
+        return 0;
+
+    if (nearest_is_left) {
+        *ip = left_ip;
+        return 1;
+    } else {
+        *ip = right_ip;
+        return 1;
     }
 }
 
@@ -197,55 +246,7 @@ static int
 find_first_intersected_bvh_triangle(intersection_point* ip,
     vec3 ray_origin, vec3 ray_direction)
 {
-    bvh_node *current_node = bvh_root;
-    bvh_node *left_child, *right_child;
-    float tmin_left, tmax_left,
-          tmin_right, tmax_right,
-          tmin, tmax;
-    int left_intersected, right_intersected;
-
-    // first get the boundary values for t
-    bbox_intersect(&tmin, &tmax, current_node->bbox, ray_origin, ray_direction, 0, 1000);
-
-    while (1) {
-        if (current_node->is_leaf) {
-            // check the triangles
-            check_triangles(ip, current_node, ray_origin, ray_direction);
-            break;
-        }
-
-        left_child = inner_node_left_child(current_node);
-        right_child = inner_node_right_child(current_node);
-
-        left_intersected = bbox_intersect(&tmin_left, &tmax_left, left_child->bbox, ray_origin, ray_direction, tmin, tmax);
-        right_intersected = bbox_intersect(&tmin_right, &tmax_right, right_child->bbox, ray_origin, ray_direction, tmin, tmax);
-
-        // check which child to further process
-        if (left_intersected && !right_intersected)
-            current_node = left_child;
-        else if (!left_intersected && right_intersected)
-            current_node = right_child;
-        else if (left_intersected && right_intersected) {
-            // it's now certain that both children were intersected
-            if (tmin_left < tmin_right) {
-                current_node = left_child;
-                tmin = tmin_left;
-                tmax = tmax_left;
-            }
-
-            else {
-                current_node = right_child;
-                tmin = tmin_right;
-                tmax = tmax_right;
-            }
-        }
-        
-        else {
-            return 0;
-        }
-    }
-
-    return 1;
+    return recursive_bvh(bvh_root, ip, ray_origin, ray_direction, 0, 100);
 }
 
 // Returns the nearest hit of the given ray with objects in the scene
