@@ -166,6 +166,7 @@ ray_intersects_sphere(intersection_point* ip, sphere sph,
     return 1;
 }
 
+
 // Checks for an intersection of the given ray with the triangles
 // stored in the BVH.
 //
@@ -179,6 +180,66 @@ static int
 find_first_intersected_bvh_triangle(intersection_point* ip,
     vec3 ray_origin, vec3 ray_direction)
 {
+    bvh_node *node = bvh_root;
+    // Children nodes
+    bvh_node *n1, *n2; 
+
+    // values for which bounding box intersected (and child temps)
+   float tmin, tmax, tmin1, tmax1, tmin2, tmax2;
+    // If intersection with rootnote continue the algorithm.
+   if(bbox_intersect(&tmin, &tmax, node->bbox, ray_origin, ray_direction, 0, 1000 ))
+    {
+
+        // Check children
+        while(!node->is_leaf)
+        {
+            n1 = node->u.inner.left_child;
+            
+            n2 = node->u.inner.right_child;;
+
+            // Check if there is an intersection with children
+            if(bbox_intersect(&tmin1, &tmax1, n1->bbox, ray_origin, ray_direction, tmin, tmax) ||
+               bbox_intersect(&tmin2, &tmax2, n2->bbox, ray_origin, ray_direction, tmin, tmax))
+            {
+                // Choose node closest to continue
+                if(tmax1 < tmin2)
+                {
+                    node = n1;
+                    tmin = tmin1;
+                    tmax = tmax1;
+                }
+                else
+                {
+                    node = n2;
+                    tmin = tmin2;
+                    tmax = tmax2;
+                }
+            }
+            else{
+                // No intersections, return 0.
+                return 0;
+            }
+        }
+        // Check all triangles to see if there is an intersection
+        int intersected = 0;
+        int i;
+        int num_triangles = node->u.leaf.num_triangles;
+        triangle *triangles = node->u.leaf.triangles;
+        for(i = 0; i < num_triangles; i ++)
+        {
+            if( ray_intersects_triangle(ip, triangles[i],
+                ray_origin, ray_direction))
+            { 
+                intersected = 1;
+            }
+        }
+        return intersected;
+  
+
+
+    }
+
+
     return 0;
 }
 

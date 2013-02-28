@@ -186,31 +186,26 @@ shade_blinn_phong(intersection_point ip)
 vec3
 shade_reflection(intersection_point ip)
 {
-    float angle = 0, colour = 0, original, reflected = 0;
+    float angle = 0, colour = 0, original = 0;
 
     // Reflect direction
-    vec3 r, temp;
+    vec3 r = v3_multiply(ip.n, 2);
+    r = v3_multiply(r, v3_dotprod(ip.i, ip.n));
+    r = v3_subtract(r, ip.i);
+    r = v3_normalize(r);
 
+    vec3 reflected =  ray_color(ip.ray_level + 1, v3_add(ip.p, v3_multiply(ip.n, 0.01)), r);
     // Add lighting effect of all light sources
     for(int i = 0; i < scene_num_lights; i ++ )
     {
 
-        angle = v3_dotprod(ip.i, ip.n);
-        temp = v3_multiply(v3_multiply(ip.n, angle), 2);
-        r =  v3_subtract(temp, ip.i);
-        r = v3_normalize(r);
-
-        original = 0.75 * diffuse_term(ip, scene_lights[i]);
-       
-        reflected =  ray_color(ip.ray_level + 1, v3_add(ip.p, v3_multiply(ip.n, 0.01)), r).x * 0.25;
-        if(reflected == (scene_background_color.x * 0.25))
-        {
-            reflected = 0;
-        }
-        colour += (original + reflected);
+        original +=  diffuse_term(ip, scene_lights[i]);
         
     }
-    return v3_create(colour, colour, colour);
+    original *= 0.75;
+    return v3_create(original + reflected.x * 0.25, 
+                     original + reflected.y * 0.25,
+                     original + reflected.z * 0.25);
 }
 
 // Returns the shaded color for the given point to shade.
