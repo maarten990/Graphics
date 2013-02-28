@@ -193,6 +193,15 @@ find_first_intersected_bvh_triangle(intersection_point* ip,
     glutSwapBuffers();
     */
     
+    // All nodes that at first are ignored
+    bvh_node *others[1000];
+    float tmino[1000];
+    float tmaxo[1000];
+    // Index for others
+    int io = 0;
+
+
+
     bvh_node *node = bvh_root;
     // Children nodes
     bvh_node *n1, *n2; 
@@ -224,12 +233,21 @@ find_first_intersected_bvh_triangle(intersection_point* ip,
                         node = n1;
                         tmin = tmin1;
                         tmax = tmax1;
+                        others[io] = n2;
+                        tmino[io] = tmin2;
+                        tmaxo[io] = tmax2;
+                        io ++;
+                        
                     }
                     else
                     {
                         node = n2;
                         tmin = tmin2;
                         tmax = tmax2;
+                        others[io] = n1;
+                        tmino[io] = tmin1;
+                        tmaxo[io] = tmax1;
+                        io ++;
                     }
                 }
                 // In case only the first child intersects make that the new
@@ -248,9 +266,20 @@ find_first_intersected_bvh_triangle(intersection_point* ip,
                         tmax = tmax2;
                 }
             }
+
+            // No intersections, return 0.
             else{
-                // No intersections, return 0.
-                return 0;
+                if(io == 0)
+                { 
+                    return 0;
+                }
+                else{
+
+                    io--;
+                    node = others[io];
+                    tmin = tmino[io];
+                    tmax = tmaxo[io];
+                }
             }
         }
         // Check all triangles to see if there is an intersection
