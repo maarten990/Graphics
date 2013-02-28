@@ -193,8 +193,7 @@ ray_trace(void)
           top = -image_plane_height / 2;
 
     // rays are expressed as a location vector and direction vector
-    vec3 ray_origin = scene_camera_position,
-         ray_direction;
+    vec3 ray_origin = scene_camera_position;
     float u, v, w;
 
     // Loop over all pixels in the framebuffer
@@ -202,20 +201,53 @@ ray_trace(void)
     {
         for (i = 0; i < framebuffer_width; i++)
         {
+            vec3 directions[4];
+            int directions_i = 0;
+            float offsets[4];
+            int offsets_n;
+
+            // if anti-aliasing is activated, shoot 4 rays through each pixel
+            // slightly offset from the center
+            if (do_antialiasing) {
+                offsets_n = 2;
+                offsets[0] = 0.25;
+                offsets[1] = 0.75;
+            }
+
+            // without anti-aliasing, just send a single ray through the
+            // pixel-center
+            else {
+                offsets_n = 1;
+                offsets[0] = 0.5;
+            }
+
             // calculate the [u, v, w] components of the pixel's location
             // relative to the camera
-            w = 1;
-            u = left + (right - left) * (i + 0.5) / framebuffer_width;
-            v = bottom + (top - bottom) * (j + 0.5) / framebuffer_height;
+            for (int u_offset = 0; u_offset < offsets_n; ++u_offset) {
+                for (int v_offset = 0; v_offset < offsets_n; ++v_offset) {
+                    w = 1;
+                    u = left + (right - left) * (i + u_offset) / framebuffer_width;
+                    v = bottom + (top - bottom) * (j + v_offset) / framebuffer_height;
 
-            // the direction of the ray is a a linear combination of the camera
-            // basisvectors
-            ray_direction = v3_add3(v3_multiply(forward_vector, w),
-                                    v3_multiply(right_vector, u),
-                                    v3_multiply(up_vector, v));
+                    // the direction of the ray is a a linear combination of the camera
+                    // basisvectors
+                    directions[directions_i] = v3_add3(v3_multiply(forward_vector, w),
+                                                       v3_multiply(right_vector, u),
+                                                       v3_multiply(up_vector, v));
+                    directions_i += 1;
+                }
+            }
 
-            // Output pixel color
-            color = ray_color(0, ray_origin, ray_direction);
+
+            // Output average pixel color
+            color = v3_create(0.0, 0.0, 0.0);
+            int num_directions = do_antialiasing ? 2 * offsets_n : 1;
+            for (int dir = 0; dir < num_directions; ++dir) {
+                color = v3_add(color, ray_color(0, ray_origin, directions[dir]) );
+            }
+
+            color = v3_multiply(color, 1.0 / num_directions);
+
             put_pixel(i, j, color.x, color.y, color.z);
         }
 
