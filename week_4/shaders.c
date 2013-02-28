@@ -125,7 +125,7 @@ shade_blinn_phong(intersection_point ip)
           alpha = 50;
     
     // the diffuse shading only affects the red color channel, while the
-    // specular channel affects red, green and blue equally (thus it is
+    // specular channel affects red, greed ed en and blue equally (thus it is
     // white-coloured)
     float all = 0,
           red = scene_ambient_light;
@@ -147,10 +147,41 @@ shade_blinn_phong(intersection_point ip)
     return v3_create(red, all, all);
 }
 
+
+// Create matt shading with reflections
 vec3
 shade_reflection(intersection_point ip)
 {
-    return v3_create(1, 0, 0);
+    float angle = 0, colour = 0, original, reflected;
+
+    // Reflect direction
+    vec3 r, temp;
+
+    // Add lighting effect of all light sources
+    for(int i = 0; i < scene_num_lights; i ++ )
+    {
+
+        angle = v3_dotprod(ip.i, ip.n);
+        temp = v3_multiply(v3_multiply(ip.n, angle), 2);
+        r =  v3_subtract(temp, ip.i);
+        r = v3_normalize(r);
+
+        original = 0.75 * diffuse_term(ip, scene_lights[i]);
+        if(original < 0 )
+        {
+            printf("\n\n\n\n\n IS SMALLER THAN ZERO\n\n\n");
+            
+        }
+        reflected =  ray_color(ip.ray_level + 1, ip.p, r).x * 0.25;
+        if ( reflected == (scene_background_color.x * 0.25 ))
+        {
+            reflected = 0;
+            
+        }
+        colour += (original + reflected);
+        
+    }
+    return v3_create(colour, colour, colour);
 }
 
 // Returns the shaded color for the given point to shade.
