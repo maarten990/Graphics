@@ -101,7 +101,6 @@ specular_term(intersection_point ip, light lsource, float alpha)
 vec3
 shade_matte(intersection_point ip)
 {
-<<<<<<< HEAD
     float color = scene_ambient_light;
 
     // loop through each lightsource
@@ -110,7 +109,6 @@ shade_matte(intersection_point ip)
     }
 
     return v3_create(color, color, color);
-=======
 
     // Normal vector
     vec3 n = ip.n;
@@ -145,7 +143,6 @@ shade_matte(intersection_point ip)
     }
 
     return v3_create(r, g, b);
->>>>>>> d4dca791ddbd04535e0cfbe4cb377ba0120b3a79
 }
 
 vec3
@@ -189,7 +186,7 @@ shade_blinn_phong(intersection_point ip)
 vec3
 shade_reflection(intersection_point ip)
 {
-    float angle = 0, colour = 0, original, reflected;
+    float angle = 0, colour = 0, original, reflected = 0;
 
     // Reflect direction
     vec3 r, temp;
@@ -204,16 +201,11 @@ shade_reflection(intersection_point ip)
         r = v3_normalize(r);
 
         original = 0.75 * diffuse_term(ip, scene_lights[i]);
-        if(original < 0 )
-        {
-            printf("\n\n\n\n\n IS SMALLER THAN ZERO\n\n\n");
-            
-        }
-        reflected =  ray_color(ip.ray_level + 1, ip.p, r).x * 0.25;
-        if ( reflected == (scene_background_color.x * 0.25 ))
+       
+        reflected =  ray_color(ip.ray_level + 1, v3_add(ip.p, v3_multiply(ip.n, 0.01)), r).x * 0.25;
+        if(reflected == (scene_background_color.x * 0.25))
         {
             reflected = 0;
-            
         }
         colour += (original + reflected);
         
