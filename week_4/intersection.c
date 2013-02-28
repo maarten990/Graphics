@@ -17,6 +17,8 @@
 #include "constants.h"
 #include "scene.h"
 #include "bvh.h"
+#include <GL/gl.h>
+#include <GL/glut.h>
 
 // A few counters for gathering statistics on the number and types
 // of ray shot
@@ -176,10 +178,21 @@ ray_intersects_sphere(intersection_point* ip, sphere sph,
 //
 // Returns 0 if there are no intersections
 
+int w = 0;
 static int
 find_first_intersected_bvh_triangle(intersection_point* ip,
     vec3 ray_origin, vec3 ray_direction)
 {
+    /*
+    w ++;
+    glColor3f(0, 1, 1);
+    glBegin(GL_LINES);
+    glVertex3f(ray_origin.x, ray_origin.y, ray_origin.z);
+    glVertex3f(ray_direction.x, ray_direction.y, ray_direction.z);
+    glEnd();
+    glutSwapBuffers();
+    */
+    
     bvh_node *node = bvh_root;
     // Children nodes
     bvh_node *n1, *n2; 
@@ -187,7 +200,7 @@ find_first_intersected_bvh_triangle(intersection_point* ip,
     // values for which bounding box intersected (and child temps)
    float tmin, tmax, tmin1, tmax1, tmin2, tmax2;
     // If intersection with rootnote continue the algorithm.
-   if(bbox_intersect(&tmin, &tmax, node->bbox, ray_origin, ray_direction, 0, 1000 ))
+   if(bbox_intersect(&tmin, &tmax, node->bbox, ray_origin, ray_direction, 0, 4000 ))
     {
 
         // Check children
@@ -201,18 +214,38 @@ find_first_intersected_bvh_triangle(intersection_point* ip,
             if(bbox_intersect(&tmin1, &tmax1, n1->bbox, ray_origin, ray_direction, tmin, tmax) ||
                bbox_intersect(&tmin2, &tmax2, n2->bbox, ray_origin, ray_direction, tmin, tmax))
             {
-                // Choose node closest to continue
-                if(tmax1 < tmin2)
+
+                // in case both intersect check which is best
+                if(bbox_intersect(&tmin1, &tmax1, n1->bbox, ray_origin, ray_direction, tmin, tmax) &&
+                   bbox_intersect(&tmin2, &tmax2, n2->bbox, ray_origin, ray_direction, tmin, tmax))
                 {
-                    node = n1;
-                    tmin = tmin1;
-                    tmax = tmax1;
+                    if(tmax1 <= tmin2)
+                    {
+                        node = n1;
+                        tmin = tmin1;
+                        tmax = tmax1;
+                    }
+                    else
+                    {
+                        node = n2;
+                        tmin = tmin2;
+                        tmax = tmax2;
+                    }
                 }
-                else
+                // In case only the first child intersects make that the new
+                // node
+                else if (  bbox_intersect(&tmin1, &tmax1, n1->bbox, ray_origin, ray_direction, tmin, tmax))
                 {
-                    node = n2;
-                    tmin = tmin2;
-                    tmax = tmax2;
+                        node = n1;
+                        tmin = tmin1;
+                        tmax = tmax1;
+
+                } 
+                
+                else{
+                        node = n2;
+                        tmin = tmin2;
+                        tmax = tmax2;
                 }
             }
             else{
@@ -225,21 +258,26 @@ find_first_intersected_bvh_triangle(intersection_point* ip,
         int i;
         int num_triangles = node->u.leaf.num_triangles;
         triangle *triangles = node->u.leaf.triangles;
+        intersection_point temp_ip;
         for(i = 0; i < num_triangles; i ++)
         {
             if( ray_intersects_triangle(ip, triangles[i],
                 ray_origin, ray_direction))
             { 
+                
+                // Replace ip with temp ip in case closer to camera
+                if(temp_ip.t < ip->t)
+                {
+                     ray_intersects_triangle(ip, triangles[i],
+                        ray_origin, ray_direction);
+
+                }
+
                 intersected = 1;
             }
         }
         return intersected;
-  
-
-
     }
-
-
     return 0;
 }
 
