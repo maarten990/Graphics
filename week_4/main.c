@@ -226,8 +226,8 @@ ray_trace(void)
             for (int u_offset = 0; u_offset < offsets_n; ++u_offset) {
                 for (int v_offset = 0; v_offset < offsets_n; ++v_offset) {
                     w = 1;
-                    u = left + (right - left) * (i + u_offset) / framebuffer_width;
-                    v = bottom + (top - bottom) * (j + v_offset) / framebuffer_height;
+                    u = left + (right - left) * (i + offsets[u_offset]) / framebuffer_width;
+                    v = bottom + (top - bottom) * (j + offsets[v_offset]) / framebuffer_height;
 
                     // the direction of the ray is a a linear combination of the camera
                     // basisvectors
