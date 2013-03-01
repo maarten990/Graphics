@@ -193,6 +193,8 @@ find_first_intersected_bvh_triangle(intersection_point* ip,
     glutSwapBuffers();
     */
     
+
+
     // All nodes that at first are ignored
     bvh_node *others[1000];
     float tmino[1000];
@@ -211,6 +213,7 @@ find_first_intersected_bvh_triangle(intersection_point* ip,
     // If intersection with rootnote continue the algorithm.
    if(bbox_intersect(&tmin, &tmax, node->bbox, ray_origin, ray_direction, 0, 4000 ))
     {
+    
 
         // Check children
         while(!node->is_leaf)
@@ -305,6 +308,7 @@ find_first_intersected_bvh_triangle(intersection_point* ip,
                 intersected = 1;
             }
         }
+       
         return intersected;
     }
     return 0;

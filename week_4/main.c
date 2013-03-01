@@ -202,6 +202,7 @@ ray_trace(void)
     {
         for (i = 0; i < framebuffer_width; i++)
         {
+            printf(" Pixel: (%d, %d) \n", i, j);
             // calculate the [u, v, w] components of the pixel's location
             // relative to the camera
             w = 1;
