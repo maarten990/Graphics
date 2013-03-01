@@ -39,6 +39,9 @@ int num_bboxes_tested = 0;
 
 static int  find_first_intersected_bvh_triangle(intersection_point* ip,
                 vec3 ray_origin, vec3 ray_direction);
+int check_triangles(intersection_point* ip,
+                    vec3 ray_origin, vec3 ray_direction, bvh_node *node);
+
 
 // Checks if the given triangle is intersected by ray with given
 // origin and direction.
@@ -169,6 +172,37 @@ ray_intersects_sphere(intersection_point* ip, sphere sph,
 }
 
 
+// Check all triangles in the bbox and return 1 in case of intersection
+int check_triangles(intersection_point* ip,
+                    vec3 ray_origin, vec3 ray_direction, bvh_node *node)
+{
+    // Check all triangles to see if there is an intersection
+    int intersected = 0;
+    int num_triangles = node->u.leaf.num_triangles;
+    triangle *triangles = node->u.leaf.triangles;
+    intersection_point temp_ip;
+    for(int i = 0; i < num_triangles; i ++)
+    {
+        if( ray_intersects_triangle(ip, triangles[i],
+                                    ray_origin, ray_direction))
+        { 
+            // Replace ip with temp ip in case closer to camera
+            if(temp_ip.t < ip->t)
+            {
+                ray_intersects_triangle(ip, triangles[i],
+                                        ray_origin, ray_direction);
+            }
+
+            intersected = 1;
+        }
+    }
+    if(!intersected)
+   printf(" NO INTERSECTION\n");
+    return intersected;
+
+}
+
+
 // Checks for an intersection of the given ray with the triangles
 // stored in the BVH.
 //
@@ -285,32 +319,12 @@ find_first_intersected_bvh_triangle(intersection_point* ip,
                 }
             }
         }
-        // Check all triangles to see if there is an intersection
-        int intersected = 0;
-        int i;
-        int num_triangles = node->u.leaf.num_triangles;
-        triangle *triangles = node->u.leaf.triangles;
-        intersection_point temp_ip;
-        for(i = 0; i < num_triangles; i ++)
-        {
-            if( ray_intersects_triangle(ip, triangles[i],
-                ray_origin, ray_direction))
-            { 
-                
-                // Replace ip with temp ip in case closer to camera
-                if(temp_ip.t < ip->t)
-                {
-                     ray_intersects_triangle(ip, triangles[i],
-                        ray_origin, ray_direction);
-
-                }
-
-                intersected = 1;
-            }
-        }
+ 
        
-        return intersected;
+        // Return 1 in case of triangle intersection, else 0
+        return check_triangles(ip, ray_origin, ray_direction, node);
     }
+   printf(" NO INTERSECTION\n");
     return 0;
 }
 
