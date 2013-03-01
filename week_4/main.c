@@ -203,7 +203,7 @@ ray_trace(void)
         {
             vec3 directions[4];
             int directions_i = 0;
-            float offsets[4];
+            float offsets[2];
             int offsets_n;
 
             // if anti-aliasing is activated, shoot 4 rays through each pixel
