@@ -174,12 +174,13 @@ int check_triangles(intersection_point *ip, bvh_node *node,
     triangle *triangles = leaf_node_triangles(node);
     intersection_point temp_ip;
     int found = 0;
+    ip->t = C_INFINITY;
 
     for (int i = 0; i < num_triangles; ++i) {
         if (ray_intersects_triangle(&temp_ip, triangles[i], ray_origin, ray_direction)) {
             if (temp_ip.t < ip->t) {
                 found = 1;
-                ray_intersects_triangle(ip, triangles[i], ray_origin, ray_direction);
+                *ip = temp_ip;
             }
         }
     }
@@ -196,7 +197,8 @@ int recursive_bvh(bvh_node *node, intersection_point *ip,
         return check_triangles(ip, node, ray_origin, ray_direction);
     }
 
-    if (!bbox_intersect(&tmin, &tmax, node->bbox, ray_origin, ray_direction, tmin, tmax)) {
+    float tmin_new, tmax_new;
+    if (!bbox_intersect(&tmin_new, &tmax_new, node->bbox, ray_origin, ray_direction, tmin, tmax)) {
         return 0;
     }
 
@@ -207,14 +209,14 @@ int recursive_bvh(bvh_node *node, intersection_point *ip,
     float nearest = 0;
     int nearest_is_left = -1;
 
-    if (recursive_bvh(left, &left_ip, ray_origin, ray_direction, tmin, tmax)) {
+    if (recursive_bvh(left, &left_ip, ray_origin, ray_direction, tmin_new, tmax_new)) {
         if (left_ip.t > 0) {
             nearest = left_ip.t;
             nearest_is_left = 1;
         }
     }
 
-    if (recursive_bvh(right, &right_ip, ray_origin, ray_direction, tmin, tmax)) {
+    if (recursive_bvh(right, &right_ip, ray_origin, ray_direction, tmin_new, tmax_new)) {
         if ((!nearest || right_ip.t < nearest) && right_ip.t > 0) {
             nearest = right_ip.t;
             nearest_is_left = 0;
