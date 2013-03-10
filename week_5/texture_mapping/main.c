@@ -309,15 +309,20 @@ DrawPolylist(polys * list)
         // Make the correct texture active
         glBindTexture(GL_TEXTURE_2D, p.texture_id);
 
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+
         glBegin(GL_POLYGON);
         for (j = 0; j < p.points; j++)
         {
+            glTexCoord2f(p.tcoord[j].x, p.tcoord[j].y);
             glNormal3f(p.normal[j].x, p.normal[j].y, p.normal[j].z);
             glVertex3f(p.pts[j].x, p.pts[j].y, p.pts[j].z);
         }
         glEnd();
     }
 }
+
 
 void
 SetupCamera(void)
