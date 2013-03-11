@@ -102,9 +102,14 @@ setHemispherePoint(vec3 *p, vec3* n, vec3* t, int latitude, int longitude,
     p->y = oy + sin(latitude * dToR) * s;
     p->z = oz + cos(longitude * dToR) * cos(latitude * dToR) * s;
 
+    printf("latitude: %d \n longitude %d\n\n", latitude, longitude);
+
     // Set texture coordinate
-    t->x = 0.0;
-    t->y = 0.0;
+    //t->x = latitude / 90.0;
+    //t->y = longitude/ 360.0;
+    t->x = longitude / 360.0;
+    t->y = latitude / 90.0;
+
 
     // calculate normal
     n->x = p->x - ox;
@@ -189,6 +194,8 @@ createCylinder(polys * list, double radius, double height,
 
         for (i = 0; i < 4; i++)
         {
+          
+
             p.normal[i].x = p.pts[i].x - ox;
             p.normal[i].y = 0.0;
             p.normal[i].z = p.pts[i].z - oz;
@@ -199,6 +206,46 @@ createCylinder(polys * list, double radius, double height,
 
             // Set texture coordinate
             p.tcoord[i].x = p.tcoord[i].y = 0.0;
+            if(longitude > 0)
+            {
+
+                p.tcoord[i].x = longitude / 360.0 ;
+
+            }
+            else{
+                p.tcoord[i].x = 0;
+            }
+            switch(i)
+            {
+                case 0:
+                p.tcoord[i].y = 0 ;
+                break;
+
+                case 1:
+                p.tcoord[i].y = 1 ;
+                break;
+
+                case 2:
+                p.tcoord[i].y = 0 ;
+                break;
+
+                case 3:
+                p.tcoord[i].y = 1 ;
+                break;
+
+            }
+            if(i > 0)
+            {
+
+                p.tcoord[i].y = i/4.0 ;
+
+            }
+            else{
+                p.tcoord[i].y = 0.0;
+            }
+
+
+
         }
 
         AddPolyToPolylist(list, p);
@@ -265,9 +312,9 @@ readPolyVertices(poly *p, FILE *f, const vec3 *vertex_list, int num_vertices_to_
 // Read a polygonal object from a .OBJ file.
 // Scale the input coordinates uniformly with a factor s followed by
 // a translation (tx,ty,tz).
-void
+    void
 loadPolygonalObject(polys* list, const char *objfile, GLuint *texture_names,
-    double s, double tx, double ty, double tz)
+                    double s, double tx, double ty, double tz)
 {
     FILE    *f;
     char    line[1024];
