@@ -37,7 +37,8 @@ voxel2idx(int i, int j, int k)
 cell
 get_cell(int i, int j, int k)
 {
-    cell c;
+    int index = voxel2idx(i, j, k);
+    cell c = volume[index];
     return c;
 }
 
