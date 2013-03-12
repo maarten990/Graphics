@@ -428,13 +428,11 @@ DrawGLScene(void)
 
         DrawPolylist(polylistTreeStem);
 
+        // Draw all leaves
         for(int i = 0; i < 360; i += 45)
         {
-            glPushMatrix();
             glRotatef(i, 0, 1, 0);
             DrawPolylist(polylistTreeLeafs);
-            glPopMatrix();
-
         }
 
         glPopMatrix();
