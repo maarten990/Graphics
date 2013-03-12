@@ -44,6 +44,7 @@ generate_tetrahedron_triangles(triangle *triangles, unsigned char isovalue, cell
     return 0;
 }
 
+
 /* Generate triangles for a single cell for the given iso-value. This function
    should produce at most 6 * 2 triangles (for which the "triangles" array should
    have enough space).
@@ -56,5 +57,22 @@ generate_tetrahedron_triangles(triangle *triangles, unsigned char isovalue, cell
 int
 generate_cell_triangles(triangle *triangles, cell c, unsigned char isovalue)
 {
-    return 0;
+    // keep track of the triangles entered so far to give as offset to the array
+    int num_triangles = 0;
+
+    // add each tetrahedron
+    num_triangles += generate_tetrahedron_triangles(triangles + num_triangles,
+                                                    isovalue, c, 0, 1, 3, 7);
+    num_triangles += generate_tetrahedron_triangles(triangles + num_triangles,
+                                                    isovalue, c, 0, 2, 6, 7);
+    num_triangles += generate_tetrahedron_triangles(triangles + num_triangles,
+                                                    isovalue, c, 0, 1, 5, 7);
+    num_triangles += generate_tetrahedron_triangles(triangles + num_triangles,
+                                                    isovalue, c, 0, 2, 3, 7);
+    num_triangles += generate_tetrahedron_triangles(triangles + num_triangles,
+                                                    isovalue, c, 0, 4, 5, 7);
+    num_triangles += generate_tetrahedron_triangles(triangles + num_triangles,
+                                                    isovalue, c, 0, 4, 6, 7);
+
+    return num_triangles;
 }
