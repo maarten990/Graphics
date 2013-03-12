@@ -37,8 +37,17 @@ voxel2idx(int i, int j, int k)
 cell
 get_cell(int i, int j, int k)
 {
-    int index = voxel2idx(i, j, k);
-    cell c = volume[index];
+    cell c; 
+
+    // Add all vertex values of cell
+    c.p[0] = volume[voxel2idx(i, j, k)];
+    c.p[0] = volume[voxel2idx(i + 1, j, k)];
+    c.p[0] = volume[voxel2idx(i, j + 1, k)];
+    c.p[0] = volume[voxel2idx(i + 1, j + 1, k)];
+    c.p[0] = volume[voxel2idx(i, j, k + 1)];
+    c.p[0] = volume[voxel2idx(i + 1, j, k + 1)];
+    c.p[0] = volume[voxel2idx(i, j + 1, k + 1)];
+    c.p[0] = volume[voxel2idx(i + 1, j + 1, k + 1)];
     return c;
 }
 
