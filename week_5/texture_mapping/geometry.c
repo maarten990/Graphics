@@ -205,7 +205,6 @@ createCylinder(polys * list, double radius, double height,
             p.normal[i].z /= len;
 
             // Set texture coordinate
-            p.tcoord[i].x = p.tcoord[i].y = 0.0;
             if(longitude > 0)
             {
 
@@ -222,7 +221,7 @@ createCylinder(polys * list, double radius, double height,
                 break;
 
                 case 1:
-                p.tcoord[i].y = 1 ;
+                p.tcoord[i].y = height ;
                 break;
 
                 case 2:
@@ -230,14 +229,14 @@ createCylinder(polys * list, double radius, double height,
                 break;
 
                 case 3:
-                p.tcoord[i].y = 1 ;
+                p.tcoord[i].y = height ;
                 break;
 
             }
-            if(i > 0)
+            if(p.pts[i].y > 0)
             {
 
-                p.tcoord[i].y = i/4.0 ;
+                p.tcoord[i].y =  p.pts[i].y ;
 
             }
             else{

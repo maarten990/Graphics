@@ -260,12 +260,14 @@ InitGL(void)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
             glCheckError("glTexParameteri");
 
-            glTexImage2D(GL_TEXTURE_2D, 0, texture_internal_format,
-                width, height, 0, texture_format, texture_type, image_data);
-            glCheckError("glTexImage2D");
+            //glTexImage2D(GL_TEXTURE_2D, 0, texture_internal_format,
+            //    width, height, 0, texture_format, texture_type, image_data);
+            gluBuild2DMipmaps(GL_TEXTURE_2D, texture_internal_format,
+                width, height, texture_format, texture_type, image_data);
+            //glCheckError("glTexImage2D");
 
             // Free the image data, as OpenGL will have made its internal copy by now
             free(image_data);
@@ -426,7 +428,7 @@ DrawGLScene(void)
         glScalef(1, 1 + (rand_float()-0.5)*0.6, 1);
 
         DrawPolylist(polylistTreeStem);
-        DrawPolylist(polylistTreeLeafs);
+        //DrawPolylist(polylistTreeLeafs);
 
         glPopMatrix();
     }
