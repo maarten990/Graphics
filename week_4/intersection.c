@@ -166,6 +166,92 @@ ray_intersects_sphere(intersection_point* ip, sphere sph,
     return 1;
 }
 
+
+/**
+ * Checks if the given leafnode is intersected by the ray specified by
+ * ray_origin and ray_direction, and if so sets the relevant values of the ip
+ * struct.
+ */
+int check_triangles(intersection_point *ip, bvh_node *node,
+                     vec3 ray_origin, vec3 ray_direction)
+{
+    int num_triangles = leaf_node_num_triangles(node);
+    triangle *triangles = leaf_node_triangles(node);
+    intersection_point temp_ip;
+    int found = 0;
+    ip->t = C_INFINITY;
+
+    // search through each triangle contained in the bounding box
+    for (int i = 0; i < num_triangles; ++i) {
+        if (ray_intersects_triangle(&temp_ip, triangles[i], ray_origin, ray_direction)) {
+            if (temp_ip.t < ip->t) {
+                found = 1;
+                *ip = temp_ip;
+            }
+        }
+    }
+
+    return found;
+}
+
+
+/**
+ * Recursively descends through the bvh tree, returning the nearest triangle
+ * intersection (if one exists) by settings the values in the ip struct. Returns
+ * 0 if no intersection is found.
+ */
+int traverse_bvh_tree(bvh_node *node, intersection_point *ip,
+                  vec3 ray_origin, vec3 ray_direction,
+                  float tmin, float tmax)
+{
+    // for a leafnode, check the contained triangles
+    if (node->is_leaf) {
+        return check_triangles(ip, node, ray_origin, ray_direction);
+    }
+
+    float tmin_new, tmax_new;
+    
+    // if the given node is not intersected, just return 0
+    if (!bbox_intersect(&tmin_new, &tmax_new, node->bbox, ray_origin, ray_direction, tmin, tmax)) {
+        return 0;
+    }
+
+    bvh_node *left = inner_node_left_child(node);
+    bvh_node *right = inner_node_right_child(node);
+
+    intersection_point left_ip, right_ip;
+    float nearest = 0;
+    int nearest_is_left = -1;
+
+    // descend into both children and check if either of them are intersected,
+    // and if so, which one's intersection point is the closest to the camera
+
+    if (traverse_bvh_tree(left, &left_ip, ray_origin, ray_direction, tmin_new, tmax_new)) {
+        if (left_ip.t > 0) {
+            nearest = left_ip.t;
+            nearest_is_left = 1;
+        }
+    }
+
+    if (traverse_bvh_tree(right, &right_ip, ray_origin, ray_direction, tmin_new, tmax_new)) {
+        if ((!nearest || right_ip.t < nearest) && right_ip.t > 0) {
+            nearest = right_ip.t;
+            nearest_is_left = 0;
+        }
+    }
+
+    if (nearest_is_left == -1)
+        return 0;
+
+    if (nearest_is_left) {
+        *ip = left_ip;
+        return 1;
+    } else {
+        *ip = right_ip;
+        return 1;
+    }
+}
+
 // Checks for an intersection of the given ray with the triangles
 // stored in the BVH.
 //
@@ -179,7 +265,7 @@ static int
 find_first_intersected_bvh_triangle(intersection_point* ip,
     vec3 ray_origin, vec3 ray_direction)
 {
-    return 0;
+    return traverse_bvh_tree(bvh_root, ip, ray_origin, ray_direction, 0, 100);
 }
 
 // Returns the nearest hit of the given ray with objects in the scene
