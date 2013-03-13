@@ -24,7 +24,24 @@ interpolate_points(unsigned char isovalue, vec3 p1, vec3 p2, unsigned char v1, u
     /* Initially, simply return the midpoint between p1 and p2.
        So no real interpolation is done yet */
 
-    return v3_add(v3_multiply(p1, 0.5), v3_multiply(p2, 0.5));
+   float d;
+    // Translate so that one of them is zero
+    if (v1 < v2)
+    {
+        v2 -= v1;
+        isovalue -= v1;
+        d = isovalue / (float)v2;
+        return v3_add(v3_multiply(p1,  d), v3_multiply(p2, 1 - d));
+    }
+    else{
+        v1 -= v2;
+        isovalue -= v2;
+        d = isovalue / (float)v1;
+        return v3_add(v3_multiply(p1, 1 - d), v3_multiply(p2, d));
+
+    }
+
+
 }
 
 /* Adds a triangle by interpolating over the given edges (which are expected to
