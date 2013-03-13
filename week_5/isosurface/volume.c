@@ -60,13 +60,13 @@ get_cell(int i, int j, int k)
     vec3 root = v3_create(i, j, k);
     vec3 offsets, voxel;
 
-    for (int i = 0; i < 8; ++i) {
-        offsets = CELL_OFFSETS[i];
+    for (int o = 0; o < 8; ++o) {
+        offsets = CELL_OFFSETS[o];
         voxel = v3_add(root, offsets);
 
-        c.p[i]     = voxel;
-        c.n[i]     = v3_crossprod(voxel, v3_set_component(voxel, 0, voxel.x + 1));
-        c.value[i] = volume[ voxel2idx(voxel.x, voxel.y, voxel.z) ];
+        c.p[o]     = voxel;
+        //c.n[o]     = v3_crossprod(voxel, v3_set_component(voxel, 0, voxel.x + 1));
+        c.value[o] = volume[ voxel2idx(voxel.x, voxel.y, voxel.z) ];
     }
 
     return c;

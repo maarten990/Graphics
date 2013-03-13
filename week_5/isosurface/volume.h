@@ -36,4 +36,6 @@ cell get_cell(int i, int j, int k);
    and size values. */
 void read_volume(const char *fname);
 
+void init_cell_offsets(void);
+
 #endif
