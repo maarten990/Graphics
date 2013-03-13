@@ -24,7 +24,24 @@ interpolate_points(unsigned char isovalue, vec3 p1, vec3 p2, unsigned char v1, u
     /* Initially, simply return the midpoint between p1 and p2.
        So no real interpolation is done yet */
 
-    return v3_add(v3_multiply(p1, 0.5), v3_multiply(p2, 0.5));
+    float d;
+    // Translate so that one of them is zero
+    if (v1 < v2)
+    {
+        v2 -= v1;
+        isovalue -= v1;
+        d = isovalue / (float)v2;
+        return v3_add(v3_multiply(p1,  0.5), v3_multiply(p2,0.5));
+    }
+    else{
+        v1 -= v2;
+        isovalue -= v2;
+        d = isovalue / (float)v1;
+        return v3_add(v3_multiply(p1, 0.5), v3_multiply(p2, 0.5));
+
+    }
+
+
 }
 
 /* Using the given iso-value generate triangles for the tetrahedron
@@ -46,23 +63,36 @@ generate_tetrahedron_triangles(triangle *triangles, unsigned char isovalue, cell
 
     // Fill the bit mask
     if(c.value[v0] > isovalue)
+    {
+        //fprintf(stderr, "in here\n");
         mask |= 0x8;
+    }
     if(c.value[v1] > isovalue)
+    {
+        //fprintf(stderr, "in here\n");
         mask |= 0x4;
+    }
     if(c.value[v2] > isovalue)
+    {
+    //    fprintf(stderr, "in here\n");
         mask |= 0x2;
+    }
     if(c.value[v3] > isovalue)
+    {
+     //   fprintf(stderr, "in here\n");
         mask |= 0x1;
+    }
 
     int t[] = {0x1,0x2,0x4,0x8};
     int t2[] = {v3, v2, v1, v0};
 
+        fprintf(stderr, "mask: %d\n", mask);
+
     // Check for cases where 1 point is different from the others
     for(int i = 0; i < 4; i++)
     {
-        if(mask == t[i] || mask == 0xf - t[i])
+        if(mask == t[i] || mask == (0xf - t[i]))
         {
-            printf(" Found a triangle\n\n\n\n");
             // fill all elements of triangles p
             int index = 0;
             for(int j = 0; j < 4; j ++)
@@ -75,10 +105,12 @@ generate_tetrahedron_triangles(triangle *triangles, unsigned char isovalue, cell
                 {
 
                     // Fill in one of the values for triangles
-                    triangles->p[index] = interpolate_points(isovalue, c.p[t2[i]], c.p[t2[j]], t2[i], t2[j]);
+                    triangles->p[index] = interpolate_points(isovalue, c.p[t2[i]], c.p[t2[j]], c.value[t2[i]], c.value[t2[j]]);
+                    triangles->n[index] = c.n[t2[j]];
                     index ++;
                 }
             }
+            //fprintf(stderr, "found one triangle\n");
             return 1;
         }
     }
@@ -88,36 +120,61 @@ generate_tetrahedron_triangles(triangle *triangles, unsigned char isovalue, cell
     {
         case 0x3:
         case 0xc:
-            triangles->p[0] = interpolate_points(isovalue, c.p[v3], c.p[v1], v2, v1);
-            triangles->p[1] = interpolate_points(isovalue, c.p[v3], c.p[v0], v3, v0);
-            triangles->p[2] = interpolate_points(isovalue, c.p[v2], c.p[v1], v2, v1);
+            triangles->p[0] = interpolate_points(isovalue, c.p[v3], c.p[v1], c.value[v2], c.value[v1]);
+            triangles->n[0] = c.n[v1];
+            triangles->p[1] = interpolate_points(isovalue, c.p[v3], c.p[v0], c.value[v3], c.value[v0]);
+            triangles->n[1] = c.n[v0];
+            triangles->p[2] = interpolate_points(isovalue, c.p[v2], c.p[v1], c.value[v2], c.value[v1]);
+            triangles->n[2] = c.n[v1];
             triangles++;
-            triangles->p[0] = interpolate_points(isovalue, c.p[v2], c.p[v1], v2, v1);
-            triangles->p[1] = interpolate_points(isovalue, c.p[v2], c.p[v0], v2, v0);
-            triangles->p[2] = interpolate_points(isovalue, c.p[v3], c.p[v0], v3, v0);
+            triangles->p[0] = interpolate_points(isovalue, c.p[v2], c.p[v1], c.value[v2], c.value[v1]);
+            triangles->n[0] = c.n[v1];
+            triangles->p[1] = interpolate_points(isovalue, c.p[v2], c.p[v0], c.value[v2], c.value[v0]);
+            triangles->n[2] = c.n[v0];
+            triangles->p[2] = interpolate_points(isovalue, c.p[v3], c.p[v0], c.value[v3], c.value[v0]);
+            triangles->n[3] = c.n[v0];
+            //fprintf(stderr, "found two triangle\n");
             return 2;
         case 0x5:
         case 0xa:
-            triangles->p[0] = interpolate_points(isovalue, c.p[v3], c.p[v2], v3, v2);
-            triangles->p[1] = interpolate_points(isovalue, c.p[v3], c.p[v0], v3, v0);
-            triangles->p[2] = interpolate_points(isovalue, c.p[v1], c.p[v2], v1, v2);
+            triangles->p[0] = interpolate_points(isovalue, c.p[v3], c.p[v2], c.value[v3], c.value[v2]);
+            triangles->n[0] = c.n[v2];
+            triangles->p[1] = interpolate_points(isovalue, c.p[v3], c.p[v0], c.value[v3], c.value[v0]);
+            triangles->n[1] = c.n[v0];
+            triangles->p[2] = interpolate_points(isovalue, c.p[v1], c.p[v2], c.value[v1], c.value[v2]);
+            triangles->n[2] = c.n[v2];
             triangles++;
-            triangles->p[0] = interpolate_points(isovalue, c.p[v1], c.p[v2], v1, v2);
-            triangles->p[1] = interpolate_points(isovalue, c.p[v1], c.p[v0], v1, v0);
-            triangles->p[2] = interpolate_points(isovalue, c.p[v3], c.p[v2], v3, v2);
+            triangles->p[0] = interpolate_points(isovalue, c.p[v1], c.p[v2], c.value[v1], c.value[v2]);
+            triangles->n[0] = c.n[v2];
+            triangles->p[1] = interpolate_points(isovalue, c.p[v1], c.p[v0], c.value[v1], c.value[v0]);
+            triangles->n[1] = c.n[v0];
+            triangles->p[2] = interpolate_points(isovalue, c.p[v3], c.p[v2], c.value[v3], c.value[v2]);
+            triangles->n[2] = c.n[v2];
+            //fprintf(stderr, "found two triangle\n");
             return 2;
 
         case 0x6: 
         case 0x9:
-            triangles->p[0] = interpolate_points(isovalue, c.p[v1], c.p[v3], v1, v3);
-            triangles->p[1] = interpolate_points(isovalue, c.p[v1], c.p[v0], v1, v0);
-            triangles->p[2] = interpolate_points(isovalue, c.p[v2], c.p[v3], v2, v3);
+            triangles->p[0] = interpolate_points(isovalue, c.p[v1], c.p[v3], c.value[v1], c.value[v3]);
+            triangles->n[0] = c.n[v3];
+            triangles->p[1] = interpolate_points(isovalue, c.p[v1], c.p[v0], c.value[v1], c.value[v0]);
+            triangles->n[1] = c.n[v0];
+            triangles->p[2] = interpolate_points(isovalue, c.p[v2], c.p[v3], c.value[v2], c.value[v3]);
+            triangles->n[2] = c.n[v3];
             triangles++;
-            triangles->p[0] = interpolate_points(isovalue, c.p[v1], c.p[v0], v1, v2);
-            triangles->p[1] = interpolate_points(isovalue, c.p[v1], c.p[v3], v1, v0);
-            triangles->p[2] = interpolate_points(isovalue, c.p[v2], c.p[v0], v2, v0);
+            triangles->p[0] = interpolate_points(isovalue, c.p[v1], c.p[v0], c.value[v1], c.value[v2]);
+            triangles->n[0] = c.n[v2];
+            triangles->p[1] = interpolate_points(isovalue, c.p[v1], c.p[v3], c.value[v1], c.value[v0]);
+            triangles->n[1] = c.n[v0];
+            triangles->p[2] = interpolate_points(isovalue, c.p[v2], c.p[v0], c.value[v2], c.value[v0]);
+            triangles->n[2] = c.n[v0];
+            //fprintf(stderr, "found two triangle\n");
             return 2;
 
+
+    } 
+    if(mask > 0 && mask != 15)
+    {
 
     }
     

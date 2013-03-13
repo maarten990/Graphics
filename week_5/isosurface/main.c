@@ -226,14 +226,13 @@ void DrawVolumeAsIsosurface(void)
 void FillArrayWithIsosurface(void)
 {
     cell c;
-    triangle *triangles;
+    triangle triangles[13];
     triangle *temptr;
     int total_triangles = 0;
     int current_triangles = 0;
 
 
-    printf("nz: %d\n", nz);
-
+    printf("nz: %d\n", nz); 
     for (int k = 0; k < nz; k++)
     {
         for (int j = 0; j < ny; j++)
@@ -248,9 +247,9 @@ void FillArrayWithIsosurface(void)
                 {
                     temptr = triangles + t;
 
-                    AddVertexToArray(temptr->p[0], v3_create(0, 0, 1));
-                    AddVertexToArray(temptr->p[1], v3_create(0, 0, 1));
-                    AddVertexToArray(temptr->p[2], v3_create(0, 0, 1));
+                    AddVertexToArray(temptr->p[0], v3_create(0, 1, 0));
+                    AddVertexToArray(temptr->p[1], v3_create(1, 0, 0));
+                    AddVertexToArray(temptr->p[2], v3_create(0, 1, 0));
                 }
 
                 total_triangles += current_triangles;
@@ -396,7 +395,7 @@ void DrawVolumeUsingCurrentDisplayMode(void)
             glEnable(GL_RESCALE_NORMAL);
             DrawVolumeAsCubes();
             glDisable(GL_RESCALE_NORMAL);
-       a
+        }
     }
     else if (display_mode == 2)
     {
