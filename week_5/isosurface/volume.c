@@ -31,6 +31,17 @@ voxel2idx(int i, int j, int k)
     return (k*ny + j)*nx + i;
 }
 
+
+cell fill_vector(cell c, index, i, j, k );
+{
+
+    c.p[index].x = i;
+    c.p[index].y = j;
+    c.p[index].z = k;
+    return c;
+
+}
+
 /* Extract a cell from the volume, so that datapoint 0 of the
    cell corresponds to voxel (i, j, k), datapoint 1 to voxel (i+1, j, k),
    etc. See the assignment. */
@@ -40,14 +51,29 @@ get_cell(int i, int j, int k)
     cell c; 
 
     // Add all vertex values of cell
-    c.p[0] = volume[voxel2idx(i, j, k)];
-    c.p[0] = volume[voxel2idx(i + 1, j, k)];
-    c.p[0] = volume[voxel2idx(i, j + 1, k)];
-    c.p[0] = volume[voxel2idx(i + 1, j + 1, k)];
-    c.p[0] = volume[voxel2idx(i, j, k + 1)];
-    c.p[0] = volume[voxel2idx(i + 1, j, k + 1)];
-    c.p[0] = volume[voxel2idx(i, j + 1, k + 1)];
-    c.p[0] = volume[voxel2idx(i + 1, j + 1, k + 1)];
+    c.value[0] = volume[voxel2idx(i, j, k)];
+    c = fill_vector(c, 0, i, j, k);
+
+    c.value[1] = volume[voxel2idx(i + 1, j, k)];
+    c = fill_vector(c, 0, i + 1, j, k);
+
+    c.value[2] = volume[voxel2idx(i, j + 1, k)];
+    c = fill_vector(c, 0, i, j + 1, k);
+
+    c.value[3] = volume[voxel2idx(i + 1, j + 1, k)];
+    c = fill_vector(c, 0, i + 1, j + 1, k);
+
+    c.value[4] = volume[voxel2idx(i, j, k + 1)];
+    c = fill_vector(c, 0, i, j, k + 1);
+
+    c.value[5] = volume[voxel2idx(i + 1, j, k + 1)];
+    c = fill_vector(c, 0, i + 1, j, k + 1);
+
+    c.value[6] = volume[voxel2idx(i, j + 1, k + 1)];
+    c = fill_vector(c, 0, i, j + 1, k + 1);
+
+    c.value[7] = volume[voxel2idx(i + 1, j + 1, k + 1)];
+    c = fill_vector(c, 0, i + 1, j + 1, k + 1);
     return c;
 }
 

@@ -9,7 +9,7 @@ typedef struct
 {
     vec3    p[8];
     vec3    n[8];       // Note: we experiment with normals in the solution
-    double  value[8];
+    unsigned char  value[8];
 }
 cell;
 
