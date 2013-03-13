@@ -70,14 +70,14 @@ generate_tetrahedron_triangles(triangle *triangles, unsigned char isovalue, cell
      * bitmask: 0000
      * bits in hex: 0x8, 0x4, 0x2, 0x1
      */
-    if (c.value[v0] > isovalue)
-        mask |= 0x8;
-    if (c.value[v1] > isovalue)
-        mask |= 0x4;
-    if (c.value[v2] > isovalue)
-        mask |= 0x2;
-    if (c.value[v3] > isovalue)
+    if (c.value[v0] >= isovalue)
         mask |= 0x1;
+    if (c.value[v1] >= isovalue)
+        mask |= 0x2;
+    if (c.value[v2] >= isovalue)
+        mask |= 0x4;
+    if (c.value[v3] >= isovalue)
+        mask |= 0x8;
 
     switch (mask) {
         // 0001 or 1110
