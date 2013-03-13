@@ -17,6 +17,11 @@
 /* The voxels of the volume dataset, stored as a one-dimensional array */
 unsigned char   *volume;
 
+
+/* the i, j and k offsets in order as used for the cells, relative to their
+* root-voxel */
+vec3 CELL_OFFSETS[8];
+
 /* The dimensions of the volume dataset */
 int     nx, ny, nz;
 
@@ -31,51 +36,44 @@ voxel2idx(int i, int j, int k)
     return (k*ny + j)*nx + i;
 }
 
-
-cell fill_vector(cell c, index, i, j, k );
+void init_cell_offsets()
 {
-
-    c.p[index].x = i;
-    c.p[index].y = j;
-    c.p[index].z = k;
-    return c;
-
+    CELL_OFFSETS[0] = v3_create(0, 0, 0);
+    CELL_OFFSETS[1] = v3_create(1, 0, 0);
+    CELL_OFFSETS[2] = v3_create(0, 1, 0);
+    CELL_OFFSETS[3] = v3_create(1, 1, 0);
+    CELL_OFFSETS[4] = v3_create(0, 0, 1);
+    CELL_OFFSETS[5] = v3_create(1, 0, 1);
+    CELL_OFFSETS[6] = v3_create(0, 1, 1);
+    CELL_OFFSETS[7] = v3_create(1, 1, 1);
 }
 
 /* Extract a cell from the volume, so that datapoint 0 of the
-   cell corresponds to voxel (i, j, k), datapoint 1 to voxel (i+1, j, k),
-   etc. See the assignment. */
+cell corresponds to voxel (i, j, k), datapoint 1 to voxel (i+1, j, k),
+etc. See the assignment. */
 cell
 get_cell(int i, int j, int k)
 {
-    cell c; 
+    cell c;
+    init_cell_offsets(); // wasteful, but we don't want to mess with the framework
 
-    // Add all vertex values of cell
-    c.value[0] = volume[voxel2idx(i, j, k)];
-    c = fill_vector(c, 0, i, j, k);
+    // cell.p contains the 8 cornerpoints of the cell, in specific order
+    vec3 root = v3_create(i, j, k);
+    vec3 offsets, voxel;
 
-    c.value[1] = volume[voxel2idx(i + 1, j, k)];
-    c = fill_vector(c, 0, i + 1, j, k);
+    for (int n = 0; n < 8; ++n) {
+        offsets = CELL_OFFSETS[n];
+        voxel = v3_add(root, offsets);
 
-    c.value[2] = volume[voxel2idx(i, j + 1, k)];
-    c = fill_vector(c, 0, i, j + 1, k);
+        c.p[n] = voxel;
+        c.n[n] = v3_crossprod(voxel, v3_set_component(voxel, 0, voxel.x + 1));
+        c.value[n] = volume[ voxel2idx(voxel.x, voxel.y, voxel.z) ];
+    }
 
-    c.value[3] = volume[voxel2idx(i + 1, j + 1, k)];
-    c = fill_vector(c, 0, i + 1, j + 1, k);
-
-    c.value[4] = volume[voxel2idx(i, j, k + 1)];
-    c = fill_vector(c, 0, i, j, k + 1);
-
-    c.value[5] = volume[voxel2idx(i + 1, j, k + 1)];
-    c = fill_vector(c, 0, i + 1, j, k + 1);
-
-    c.value[6] = volume[voxel2idx(i, j + 1, k + 1)];
-    c = fill_vector(c, 0, i, j + 1, k + 1);
-
-    c.value[7] = volume[voxel2idx(i + 1, j + 1, k + 1)];
-    c = fill_vector(c, 0, i + 1, j + 1, k + 1);
     return c;
 }
+
+
 
 /* Utility function to read a volume dataset from a VTK file.
    This will store the data in the "volume" array and update the dimension

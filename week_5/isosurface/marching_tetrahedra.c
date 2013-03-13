@@ -38,51 +38,92 @@ interpolate_points(unsigned char isovalue, vec3 p1, vec3 p2, unsigned char v1, u
          2 triangles.
 */
 
-// Checks if only first vertex is outlier
-int single_outlier(int v0, int v1, int v2, int, v3, unsigned char isovalue)
-{
-
-    if((v0 > isovalue && v1 <= isovalue && v2 <= isovalue && v3 <= isovalue)||
-       (v0 <= isovalue && v1 > isovalue && v2 > isovalue && v3 > isovalue))
-        return 1;
-    
-    else return 0;
-
-}
-
 static int
 generate_tetrahedron_triangles(triangle *triangles, unsigned char isovalue, cell c, int v0, int v1, int v2, int v3)
 {
-    // The zero cases; when all values are above or under isovalue
-    if((c.p[v0] <= isovalue && c.p[v1] <= isovalue && c.p[v2] <= isovalue && c.p[v3] <= isovalue) ||
-        (c.p[v0] > isovalue && c.p[v1] > isovalue && c.p[v2] > isovalue && c.p[v3] > isovalue))
 
+    unsigned char mask = 0x0;
+
+    // Fill the bit mask
+    if(c.value[v0] > isovalue)
+        mask |= 0x8;
+    if(c.value[v1] > isovalue)
+        mask |= 0x4;
+    if(c.value[v2] > isovalue)
+        mask |= 0x2;
+    if(c.value[v3] > isovalue)
+        mask |= 0x1;
+
+    int t[] = {0x1,0x2,0x4,0x8};
+    int t2[] = {v3, v2, v1, v0};
+
+    // Check for cases where 1 point is different from the others
+    for(int i = 0; i < 4; i++)
     {
-        return 0;
-    }
- 
-    // The cases of 1 triangle: v0 is outlier
-    else if(single_outlier(c.p[v0], c.p[v1], c.p[v2], c.p[v3], isovalue))
-    {
-        return 0;
-    }
-    else if(single_outlier(v1, v0, v2, v3, isovalue))
-    {
-        return 0;
-    }
-    else if(single_outlier(v2, v0, v1, v3, isovalue))
-    {
-        return 0;
-    }
-    else if(single_outlier(v3, v0, v1, v2, isovalue))
-    {
-        return 0;
+        if(mask == t[i] || mask == 0xf - t[i])
+        {
+            printf(" Found a triangle\n\n\n\n");
+            // fill all elements of triangles p
+            int index = 0;
+            for(int j = 0; j < 4; j ++)
+            {
+                if(j == i)
+                {
+                    continue;
+                }
+                else
+                {
+
+                    // Fill in one of the values for triangles
+                    triangles->p[index] = interpolate_points(isovalue, c.p[t2[i]], c.p[t2[j]], t2[i], t2[j]);
+                    index ++;
+                }
+            }
+            return 1;
+        }
     }
 
+    // Check for cases where 2 points are different from the other
+    switch(mask)
+    {
+        case 0x3:
+        case 0xc:
+            triangles->p[0] = interpolate_points(isovalue, c.p[v3], c.p[v1], v2, v1);
+            triangles->p[1] = interpolate_points(isovalue, c.p[v3], c.p[v0], v3, v0);
+            triangles->p[2] = interpolate_points(isovalue, c.p[v2], c.p[v1], v2, v1);
+            triangles++;
+            triangles->p[0] = interpolate_points(isovalue, c.p[v2], c.p[v1], v2, v1);
+            triangles->p[1] = interpolate_points(isovalue, c.p[v2], c.p[v0], v2, v0);
+            triangles->p[2] = interpolate_points(isovalue, c.p[v3], c.p[v0], v3, v0);
+            return 2;
+        case 0x5:
+        case 0xa:
+            triangles->p[0] = interpolate_points(isovalue, c.p[v3], c.p[v2], v3, v2);
+            triangles->p[1] = interpolate_points(isovalue, c.p[v3], c.p[v0], v3, v0);
+            triangles->p[2] = interpolate_points(isovalue, c.p[v1], c.p[v2], v1, v2);
+            triangles++;
+            triangles->p[0] = interpolate_points(isovalue, c.p[v1], c.p[v2], v1, v2);
+            triangles->p[1] = interpolate_points(isovalue, c.p[v1], c.p[v0], v1, v0);
+            triangles->p[2] = interpolate_points(isovalue, c.p[v3], c.p[v2], v3, v2);
+            return 2;
+
+        case 0x6: 
+        case 0x9:
+            triangles->p[0] = interpolate_points(isovalue, c.p[v1], c.p[v3], v1, v3);
+            triangles->p[1] = interpolate_points(isovalue, c.p[v1], c.p[v0], v1, v0);
+            triangles->p[2] = interpolate_points(isovalue, c.p[v2], c.p[v3], v2, v3);
+            triangles++;
+            triangles->p[0] = interpolate_points(isovalue, c.p[v1], c.p[v0], v1, v2);
+            triangles->p[1] = interpolate_points(isovalue, c.p[v1], c.p[v3], v1, v0);
+            triangles->p[2] = interpolate_points(isovalue, c.p[v2], c.p[v0], v2, v0);
+            return 2;
 
 
+    }
+    
+    // If none of the cases matched all vlaues were the same. Return 0
     return 0;
-}
+  }
 
 /* Generate triangles for a single cell for the given iso-value. This function
    should produce at most 6 * 2 triangles (for which the "triangles" array should
@@ -101,12 +142,12 @@ generate_cell_triangles(triangle *triangles, cell c, unsigned char isovalue)
     int num_triangles = 0;
 
     // Look for triangles in all six possible tetrahedrons in a cell
-    num_triangles += generate_tetrahedron_triangle(triangles + num_triangles, isovalue, c, 0, 1, 3, 7);
-    num_triangles += generate_tetrahedron_triangle(triangles + num_triangles, isovalue, c, 0, 2, 6, 7);
-    num_triangles += generate_tetrahedron_triangle(triangles + num_triangles, isovalue, c, 0, 1, 5, 7);
-    num_triangles += generate_tetrahedron_triangle(triangles + num_triangles, isovalue, c, 0, 2, 3, 7);
-    num_triangles += generate_tetrahedron_triangle(triangles + num_triangles, isovalue, c, 0, 4, 5, 7);
-    num_triangles += generate_tetrahedron_triangle(triangles + num_triangles, isovalue, c, 0, 4, 6, 7);
+    num_triangles += generate_tetrahedron_triangles(triangles + num_triangles, isovalue, c, 0, 1, 3, 7);
+    num_triangles += generate_tetrahedron_triangles(triangles + num_triangles, isovalue, c, 0, 2, 6, 7);
+    num_triangles += generate_tetrahedron_triangles(triangles + num_triangles, isovalue, c, 0, 1, 5, 7);
+    num_triangles += generate_tetrahedron_triangles(triangles + num_triangles, isovalue, c, 0, 2, 3, 7);
+    num_triangles += generate_tetrahedron_triangles(triangles + num_triangles, isovalue, c, 0, 4, 5, 7);
+    num_triangles += generate_tetrahedron_triangles(triangles + num_triangles, isovalue, c, 0, 4, 6, 7);
 
     return num_triangles;
 }
