@@ -32,6 +32,7 @@ interpolate_points(unsigned char isovalue, vec3 p1, vec3 p2, unsigned char v1, u
 
         // Apply rate on right position
         return v3_add(v3_multiply(p1,  d), v3_multiply(p2, 1 - d));
+    }
     else{
         v1 -= v2;
         isovalue -= v2;
