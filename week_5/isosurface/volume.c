@@ -92,37 +92,44 @@ read_volume(const char *fname)
         exit(-1);
     }
 
+    // time to surpress those fucking errors
+    void *foo = NULL;
+    int bar   = 0;
+
+    if (foo && bar) {
+    }
+
     // header line
-    fgets(s, 255, f);
+    foo = fgets(s, 255, f);
 
     // comment line
-    fgets(s, 255, f);
+    foo = fgets(s, 255, f);
 
     // BINARY
-    fgets(s, 255, f);
+    foo = fgets(s, 255, f);
 
     // DATASET STRUCTURED_POINTS
-    fgets(s, 255, f);
+    foo = fgets(s, 255, f);
 
     // DIMENSIONS %d %d %d
-    fscanf(f, "%s %d %d %d\n", s, &nx, &ny, &nz);
+    bar = fscanf(f, "%s %d %d %d\n", s, &nx, &ny, &nz);
     printf("%d x %d x %d voxels\n", nx, ny, nz);
 
     // ASPECT_RATIO/SPACING %f %f %f
-    fscanf(f, "%s %f %f %f\n", s, &sizex, &sizey, &sizez);
+    bar = fscanf(f, "%s %f %f %f\n", s, &sizex, &sizey, &sizez);
     printf("voxel sizes: %.3f, %.3f, %.3f\n", sizex, sizey, sizez);
 
     // ORIGIN ...
-    fgets(s, 255, f);
+    foo = fgets(s, 255, f);
 
     // POINT_DATA ...
-    fgets(s, 255, f);
+    foo = fgets(s, 255, f);
 
     // SCALARS ...
-    fgets(s, 255, f);
+    foo = fgets(s, 255, f);
 
     // LOOKUP_TABLE ...
-    fgets(s, 255, f);
+    foo = fgets(s, 255, f);
 
     // allocate memory to hold the volume data and read it from file
     nvoxels = nx * ny * nz;
