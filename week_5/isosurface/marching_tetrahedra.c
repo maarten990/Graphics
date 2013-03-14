@@ -21,18 +21,17 @@
 static vec3
 interpolate_points(unsigned char isovalue, vec3 p1, vec3 p2, unsigned char v1, unsigned char v2)
 {
-    /* Initially, simply return the midpoint between p1 and p2.
-       So no real interpolation is done yet */
 
    float d;
-    // Translate so that one of them is zero
+    // subtract lowest from biggest value and create new balance
     if (v1 < v2)
     {
         v2 -= v1;
         isovalue -= v1;
         d = isovalue / (float)v2;
+
+        // Apply rate on right position
         return v3_add(v3_multiply(p1,  d), v3_multiply(p2, 1 - d));
-    }
     else{
         v1 -= v2;
         isovalue -= v2;
