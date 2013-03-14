@@ -63,9 +63,14 @@ void interpolate_edges(triangle *triangles, unsigned char isovalue, cell c,
     triangles->p[1] = p2;
     triangles->p[2] = p3;
 
-    triangles->n[0] = v3_crossprod(p1, v3_set_component(p1, 0, p1.x + 1));
-    triangles->n[1] = v3_crossprod(p2, v3_set_component(p2, 0, p1.x + 1));
-    triangles->n[2] = v3_crossprod(p3, v3_set_component(p3, 0, p1.x + 1));
+    // the surface-normal is the cross-product between 2 of the edges making up
+    // the face
+    vec3 normal = v3_crossprod(v3_subtract(c.p[u1], c.p[u0]),
+                               v3_subtract(c.p[v1], c.p[v0]));
+
+    triangles->n[0] = v3_multiply(v3_add(triangles->n[0], normal), 1.0/3.0);
+    triangles->n[1] = v3_multiply(v3_add(triangles->n[1], normal), 1.0/3.0);
+    triangles->n[2] = v3_multiply(v3_add(triangles->n[2], normal), 1.0/3.0);
 }
 
 /* Using the given iso-value generate triangles for the tetrahedron
