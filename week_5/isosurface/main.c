@@ -229,6 +229,7 @@ void FillArrayWithIsosurface(void)
     vec3 v, n;
     triangle triangles[12];
     int num_triangles;
+    int total_triangles = 0;
 
     for (int x = 0; x < nx; ++x) {
         for (int y = 0; y < ny; ++y) {
@@ -236,6 +237,7 @@ void FillArrayWithIsosurface(void)
                 c = get_cell(x, y, z);
 
                 num_triangles = generate_cell_triangles(triangles, c, isovalue);
+                total_triangles += num_triangles;
 
                 for (int i = 0; i < num_triangles; ++i) {
                     for (int j = 0; j < 3; ++j) {
@@ -248,6 +250,7 @@ void FillArrayWithIsosurface(void)
             }
         }
     }
+    printf("\nAmount of triangles: %d\n", total_triangles);
 }
 
 void DrawScene(void)
