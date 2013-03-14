@@ -22,7 +22,7 @@ static vec3
 interpolate_points(unsigned char isovalue, vec3 p1, vec3 p2, unsigned char v1, unsigned char v2)
 {
 
-   float d;
+    float d;
     // subtract lowest from biggest value and create new balance
     if (v1 < v2)
     {
@@ -33,14 +33,14 @@ interpolate_points(unsigned char isovalue, vec3 p1, vec3 p2, unsigned char v1, u
         // Apply rate on right position
         return v3_add(v3_multiply(p1,  d), v3_multiply(p2, 1 - d));
     }
-    else{
+    else
+    {
         v1 -= v2;
         isovalue -= v2;
         d = isovalue / (float)v1;
         return v3_add(v3_multiply(p1, 1 - d), v3_multiply(p2, d));
 
     }
-
 
 }
 
@@ -63,9 +63,9 @@ void interpolate_edges(triangle *triangles, unsigned char isovalue, cell c,
     triangles->p[1] = p2;
     triangles->p[2] = p3;
 
-    triangles->n[0] = v3_crossprod(p1, v3_set_component(p1, 0, p1.x + 1));
-    triangles->n[1] = v3_crossprod(p2, v3_set_component(p2, 0, p1.x + 1));
-    triangles->n[2] = v3_crossprod(p3, v3_set_component(p3, 0, p1.x + 1));
+    triangles->n[0] = v3_crossprod(p1, p2);
+    triangles->n[1] = v3_crossprod(p2, triangles->n[0] );
+    triangles->n[2] = v3_crossprod(triangles->n[2], triangles->n[1]);
 }
 
 /* Using the given iso-value generate triangles for the tetrahedron
