@@ -66,12 +66,15 @@ void interpolate_edges(triangle *triangles, unsigned char isovalue, cell c,
 
     // the surface-normal is the cross-product between 2 of the edges making up
     // the face
-    vec3 normal = v3_crossprod(v3_subtract(c.p[u1], c.p[u0]),
-                               v3_subtract(c.p[v1], c.p[v0]));
+    vec3 normal = v3_crossprod(v3_subtract(p1, p2),
+                               v3_subtract(p3, p1));
 
-    triangles->n[0] = v3_multiply(v3_add(triangles->n[0], normal), 1.0/3.0);
-    triangles->n[1] = v3_multiply(v3_add(triangles->n[1], normal), 1.0/3.0);
-    triangles->n[2] = v3_multiply(v3_add(triangles->n[2], normal), 1.0/3.0);
+    normal = v3_normalize(normal);
+    normal = v3_multiply(normal, -1);
+
+    triangles->n[0] = normal;
+    triangles->n[1] = normal;
+    triangles->n[2] = normal;
 }
 
 /* Using the given iso-value generate triangles for the tetrahedron
@@ -111,35 +114,35 @@ generate_tetrahedron_triangles(triangle *triangles, unsigned char isovalue, cell
         // 0010 or 1101
         case 0x2:
         case 0xD:
-            interpolate_edges(triangles, isovalue, c, v1, v2, v1, v3, v1, v0);
+            interpolate_edges(triangles, isovalue, c, v0, v1, v1, v2, v1, v3);
             return 1;
         // 0100 or 1011
         case 0x4:
         case 0xB:
-            interpolate_edges(triangles, isovalue, c, v2, v1, v2, v3, v2, v0);
+            interpolate_edges(triangles, isovalue, c, v1, v2, v2, v3, v0, v2);
             return 1;
         // 1000 or 0111
         case 0x8:
         case 0x7:
-            interpolate_edges(triangles, isovalue, c, v3, v0, v3, v1, v3, v2);
+            interpolate_edges(triangles, isovalue, c, v0, v3, v1, v3, v2, v3);
             return 1;
         // 0011 or 1100
         case 0x3:
         case 0xC:
-            interpolate_edges(triangles, isovalue, c, v1, v3, v1, v2, v3, v0);
-            interpolate_edges(triangles, isovalue, c, v3, v0, v0, v2, v2, v1);
+            interpolate_edges(triangles, isovalue, c, v1, v3, v1, v2, v0, v3);
+            interpolate_edges(triangles, isovalue, c, v0, v3, v0, v2, v1, v2);
             return 2;
         // 0101 or 1010
         case 0x5:
         case 0xA:
-            interpolate_edges(triangles, isovalue, c, v0, v3, v3, v2, v2, v1);
+            interpolate_edges(triangles, isovalue, c, v0, v3, v2, v3, v1, v2);
             interpolate_edges(triangles, isovalue, c, v0, v3, v0, v1, v1, v2);
             return 2;
         // 0110 or 1001
         case 0x6:
         case 0x9:
-            interpolate_edges(triangles, isovalue, c, v3, v2, v2, v0, v3, v1);
-            interpolate_edges(triangles, isovalue, c, v0, v1, v0, v2, v3, v1);
+            interpolate_edges(triangles, isovalue, c, v2, v3, v0, v2, v1, v3);
+            interpolate_edges(triangles, isovalue, c, v0, v1, v0, v2, v1, v3);
             return 2;
         // 0000 or 1111
         default:
