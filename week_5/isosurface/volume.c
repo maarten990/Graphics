@@ -65,7 +65,7 @@ get_cell(int i, int j, int k)
         voxel = v3_add(root, offsets);
 
         c.p[o]     = voxel;
-        c.n[o]     = v3_crossprod(voxel, v3_set_component(voxel, 0, voxel.x + 1));
+        c.n[o]     = v3_create(0, 0, 1);
         c.value[o] = volume[ voxel2idx(voxel.x, voxel.y, voxel.z) ];
     }
 
