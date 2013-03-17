@@ -1,3 +1,8 @@
+ARCH := $(shell getconf LONG_BIT)
+
+LD_64 = Box2D_64
+LD_32 = Box2D_32
+
 PROGNAME = main
 SRCFILES = main.cpp levels.cpp
 TARNAME = box2d.tgz
@@ -6,7 +11,7 @@ CC = g++
 
 WARNFLAGS = -Wall -Wshadow -pedantic-errors
 CFLAGS = -g -O2 $(WARNFLAGS) -Iinclude/
-LFLAGS = -lbox2d -lGL -lglut
+LFLAGS = -L$(LD_$(ARCH)) -lBox2D -lGL -lglut
 
 # Do some substitution to get a list of .o files from the given .cpp files.
 OBJFILES = $(patsubst %.cpp,%.o,$(SRCFILES))
