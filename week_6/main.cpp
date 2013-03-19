@@ -28,6 +28,18 @@ int frame_count;
 unsigned int num_levels;
 level_t *levels;
 
+// Types needed for creating a body
+b2Body* bodies[20];
+b2Body* ball;
+b2BodyDef bodyDef;
+// Defining world; only needs to be done once
+b2Vec2 gravity(0.0f, -10.0f);
+b2World world(gravity);
+
+// Values for step increment
+float32 timeStep = 1.0f / 60.0f;
+int32 velocityIterations = 6;
+int32 positionIterations = 2;
 
 /*
  * Load a given world, i.e. read the world from the `levels' data structure and
@@ -42,9 +54,15 @@ void load_world(unsigned int level)
         printf("Warning: level %d does not exist.\n", level);
         return;
     }
-
     // Create a Box2D world and populate it with all bodies for this level
     // (including the ball).
+    level_t l = levels[level];
+
+    // Create ball and put at the beginning position
+    bodyDef.type = b2_dynamicBody;
+    bodyDef.position.Set(l.start.x, l.start.y);
+    ball = world.CreateBody(&bodyDef);
+    
 }
 
 
@@ -57,13 +75,27 @@ void draw(void)
     int time = glutGet(GLUT_ELAPSED_TIME);
     int frametime = time - last_time;
     frame_count++;
+  
+    world.Step(timeStep, velocityIterations, positionIterations);
 
     // Clear the buffer
     glColor3f(0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    // Draw circles
+    glColor3f(1, 0, 0);
+    b2Vec2 position = ball->GetPosition();
+    
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex2f(position.x, position.y);
+    glVertex2f(position.x, position.y + 0.2);
+    glVertex2f(position.x + 0.2, position.y + 0.2);
+    glVertex2f(position.x + 0.2, position.y - 0.2);
+    glVertex2f(position.x - 0.2, position.y - 0.2);
+    glEnd();
+    
+    // Draw all the other elements
 
-    //
     // Do any logic and drawing here.
     //
 
