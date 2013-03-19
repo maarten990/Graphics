@@ -32,7 +32,7 @@ level_t *levels;
 b2Body* ball;
 b2BodyDef bodyDef;
 // Defining world; only needs to be done once
-b2Vec2 gravity(0.0f, -10.0f);
+b2Vec2 gravity(0.0f, -3.0f);
 b2World world(gravity);
 
 // Values for step increment
@@ -40,7 +40,6 @@ float32 timeStep = 1.0f / 60.0f;
 int32 velocityIterations = 6;
 int32 positionIterations = 2;
 
-level_t l;
 
 /*
  * Load a given world, i.e. read the world from the `levels' data structure and
@@ -57,7 +56,7 @@ void load_world(unsigned int level)
     }
     // Create a Box2D world and populate it with all bodies for this level
     // (including the ball).
-    l = levels[3];
+    level_t l = levels[3];
 
     // Create ball and put at the beginning position
     bodyDef.type = b2_dynamicBody;
@@ -79,14 +78,16 @@ void load_world(unsigned int level)
     {
         p = l.polygons[i];
         b2Vec2 *vertices = new b2Vec2[p.num_verts];
+
         // Set all vetices over into b2Vec2 vertices
         for(unsigned int j = 0; j < p.num_verts; j++ )
         {
             vertices[j].Set(p.verts[j].x, p.verts[j].y);
         }
 
-        // Add body_def to the worl object
+        // Add body_def to the world object
         pol_body  = world.CreateBody(&pol_body_def);
+        
         // Create the fixture and set vertices
         pol_shape.Set(vertices, p.num_verts);
         pol_body->CreateFixture(&pol_shape, 0.0f);
@@ -123,24 +124,23 @@ void draw(void)
         
         while(true)
         {
-
-            shape = types->GetShape();
-            /*
+            
             // Draw circle
-            if(shape)// == b2Shape::e_circle)
+            if(types->GetType() == b2Shape::e_circle)
             {
+                b2CircleShape* bal_shape = static_cast<b2CircleShape*>(types->GetShape());
                 glColor3f(1, 0, 0);
                 glBegin(GL_TRIANGLE_FAN);
                 glVertex2f(position.x, position.y);
-                glVertex2f(position.x, position.y + shape->m_radius);
-                glVertex2f(position.x + shape->m_radius, position.y + shape->m_radius);
-                glVertex2f(position.x + shape->m_radius, position.y - shape->m_radius);
-                glVertex2f(position.x - shape->m_radius, position.y - shape->m_radius);
+                glVertex2f(position.x, position.y + bal_shape->m_radius);
+                glVertex2f(position.x + 0.2, position.y + 0.2);
+                glVertex2f(position.x + 0.2, position.y - 0.2);
+                glVertex2f(position.x - 0.2, position.y - 0.2);
                 glEnd();
             }
             // Draw polygon
             else
-            {*/
+            {
                 b2PolygonShape* pol_shape = static_cast<b2PolygonShape*>(types->GetShape());
 
                 glColor3f(0, 1, 0);
@@ -153,7 +153,7 @@ void draw(void)
                 }
                 glEnd();
 
-            //}
+            }
 
             // Break if there are no more fixtures
             types = types->GetNext();
