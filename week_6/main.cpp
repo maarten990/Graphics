@@ -114,11 +114,8 @@ void createLevel(level_t &level)
         b2PolygonShape shape;
         shape.Set(vertices, num_verts);
 
-        b2FixtureDef fixture;
-        fixture.shape = &shape;
-
         // add the fixture
-        level_body->CreateFixture(&fixture);
+        level_body->CreateFixture(&shape, 0.0f);
 
         delete[] vertices;
     }
@@ -150,7 +147,7 @@ void drawPolyShape(b2PolygonShape *shape)
     int vs = shape->GetVertexCount();
     b2Vec2 vertex;
 
-    glBegin(GL_QUADS);
+    glBegin(GL_TRIANGLE_FAN);
     glColor3f(0.0, 1.0, 0.0);
 
     for (int i = 0; i < vs; ++i) {
