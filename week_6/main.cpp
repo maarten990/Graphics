@@ -18,6 +18,10 @@
 
 #include "levels.h"
 
+// prototypes
+void createLevel(level_t &level);
+void createBall(unsigned level);
+
 unsigned int reso_x = 800, reso_y = 600; // Window size in pixels
 const float world_x = 8.f, world_y = 6.f; // Level (world) size in meters
 
@@ -28,6 +32,7 @@ int frame_count;
 unsigned int num_levels;
 level_t *levels;
 
+b2World *world;
 
 /*
  * Load a given world, i.e. read the world from the `levels' data structure and
@@ -43,10 +48,143 @@ void load_world(unsigned int level)
         return;
     }
 
-    // Create a Box2D world and populate it with all bodies for this level
+    // Create the world and populate it with all bodies for this level
     // (including the ball).
+    b2Vec2 gravity(0.0, -10);
+    world = new b2World(gravity);
+
+    // create the level
+    createBall(level);
+    createLevel( levels[level] );
 }
 
+// creates a ball in the world
+void createBall(unsigned level)
+{
+    // definition
+    b2BodyDef ballDef;
+    ballDef.type = b2_dynamicBody;
+    ballDef.position.Set(levels[level].start.x, levels[level].start.y);
+
+    b2Body *ball = world->CreateBody(&ballDef);
+
+    // shape
+    b2CircleShape ballShape;
+    ballShape.m_radius = 0.3;
+
+    // fixture
+    b2FixtureDef fixture;
+    fixture.shape = &ballShape;
+    //fixture.density = 1;
+    //fixture.friction = 0.3;
+
+    ball->CreateFixture(&fixture);
+}
+
+// adds a given level to the global world as a series of static objects
+void createLevel(level_t &level)
+{
+    poly_t poly;
+    int num_verts;
+
+    // create the body definition and the body itself
+    b2BodyDef def;
+    def.type = b2_staticBody;
+    def.position.Set(0, 0);
+
+    b2Body *level_body = world->CreateBody(&def);
+
+    // loop through each polygon
+    for (unsigned p = 0; p < level.num_polygons; ++p) {
+        poly = level.polygons[p];
+        num_verts = poly.num_verts;
+
+        b2PolygonShape polyshape;
+        b2Vec2 *vertices = new b2Vec2[num_verts];
+
+        // loop through each vertex of the polyg0n
+        for (int v = 0; v < num_verts; ++v) {
+            vertices[v].Set(poly.verts[v].x,
+                            poly.verts[v].y);
+        }
+
+        /* this is where the magic happens */
+
+        // create the shape and fixture
+        b2PolygonShape shape;
+        shape.Set(vertices, num_verts);
+
+        b2FixtureDef fixture;
+        fixture.shape = &shape;
+
+        // add the fixture
+        level_body->CreateFixture(&fixture);
+
+        delete[] vertices;
+    }
+}
+
+// draws a circle
+void drawCircle(b2CircleShape *shape, b2Vec2 position)
+{
+    float radius = shape->m_radius;
+
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glBegin(GL_TRIANGLE_FAN);
+
+    // draw the center
+    glVertex2f(position.x, position.y);
+    
+    for (float i = 0.0f; i <= (2 * M_PI) + 0.01; i += 0.1f) {
+        glVertex2f(position.x + cos(i) * radius, position.y + sin(i) * radius);
+    }
+
+    glVertex2f(position.x + cos(0) * radius, position.y + sin(0) * radius);
+    
+    glEnd();
+}
+
+// draw a polygon shape
+void drawPolyShape(b2PolygonShape *shape)
+{
+    int vs = shape->GetVertexCount();
+    b2Vec2 vertex;
+
+    glBegin(GL_QUADS);
+    glColor3f(0.0, 1.0, 0.0);
+
+    for (int i = 0; i < vs; ++i) {
+        vertex = shape->GetVertex(i);
+        glVertex2f(vertex.x, vertex.y);
+    }
+
+    glEnd();
+}
+
+void drawWorld()
+{
+    b2Body *body;
+    b2Fixture *fixture;
+
+    // loop through each body in the world, and each fixture in each body
+    for (body = world->GetBodyList(); body; body = body->GetNext()) {
+        for (fixture = body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
+            // check if we're dealing with a ball or a polygonal object
+            switch(fixture->GetType()) {
+                case b2Shape::e_circle:
+                    drawCircle( static_cast<b2CircleShape*>(fixture->GetShape()),
+                                body->GetPosition());
+                    break;
+                case b2Shape::e_polygon:
+                    drawPolyShape( static_cast<b2PolygonShape*>(fixture->GetShape()) );
+                    break;
+                default:
+                    // not implemented
+                    break;
+            }
+        }
+    }
+}
 
 /*
  * Called when we should redraw the scene (i.e. every frame).
@@ -66,7 +204,8 @@ void draw(void)
     //
     // Do any logic and drawing here.
     //
-
+    world->Step(1.0f/255.0f, 8, 3);
+    drawWorld();
 
     // Show rendered frame
     glutSwapBuffers();
@@ -159,7 +298,7 @@ int main(int argc, char **argv)
     printf("Loaded %d levels.\n", num_levels);
 
     // Load the first level (i.e. create all Box2D stuff).
-    load_world(0);
+    load_world(2);
 
     last_time = glutGet(GLUT_ELAPSED_TIME);
     frame_count = 0;
