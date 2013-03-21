@@ -277,6 +277,21 @@ void draw(void)
         return;
     }
 
+    // check if the ball is out of bounds
+    for (b2Body *body = world->GetBodyList(); body; body = body->GetNext()) {
+        if(body->GetUserData() &&
+           *static_cast<int*>(body->GetUserData()) == BALL)
+        {
+            b2Vec2 center = body->GetWorldCenter();
+            if (center.x < -1 || center.x > world_x + 1 ||
+                center.y < -1 || center.y > world_y + 1)
+            {
+                load_world(g_level);
+                return;
+            }
+        }
+    }
+
 
     // Show rendered frame
     glutSwapBuffers();
