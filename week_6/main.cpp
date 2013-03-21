@@ -11,6 +11,8 @@
  */
 
 #include <cstdio>
+#include <vector>
+#include <algorithm>
 
 #include <GL/gl.h>
 #include <GL/glut.h>
@@ -366,8 +368,14 @@ void mouse_clicked(int button, int state, int x, int y)
 
             if (z < 0)
                 createPolygon(b2_dynamicBody, vertices_new, 4);
-            else
-                printf("Error: polygons must be counter-clockwise.\n");
+            else {
+                std::vector<b2Vec2> v;
+                for (int i = 0; i < 4; ++i)
+                    v.push_back(vertices_new[i]);
+
+                std::reverse(v.begin(), v.end());
+                createPolygon(b2_dynamicBody, &v[0], 4);
+            }
         }
     }
 
