@@ -38,6 +38,12 @@ level_t *levels;
 b2World *world;
 unsigned g_level;
 
+// Array that keeps track of the user created vertices
+b2Vec2 *vertices_new = new b2Vec2[4];
+int number;
+
+
+
 /*
  * Load a given world, i.e. read the world from the `levels' data structure and
  * convert it into a Box2D world.
@@ -148,7 +154,7 @@ void drawCircle(b2CircleShape *shape, b2Vec2 position)
 }
 
 // draw a polygon shape
-void drawPolyShape(b2PolygonShape *shape)
+void drawPolyShape(b2PolygonShape *shape, b2Body *body)
 {
     int vs = shape->GetVertexCount();
     b2Vec2 vertex;
@@ -157,7 +163,7 @@ void drawPolyShape(b2PolygonShape *shape)
     glColor3f(0.0, 1.0, 0.0);
 
     for (int i = 0; i < vs; ++i) {
-        vertex = shape->GetVertex(i);
+        vertex = body->GetWorldPoint(shape->GetVertex(i));
         glVertex2f(vertex.x, vertex.y);
     }
 
@@ -179,7 +185,7 @@ void drawWorld()
                                 body->GetPosition());
                     break;
                 case b2Shape::e_polygon:
-                    drawPolyShape( static_cast<b2PolygonShape*>(fixture->GetShape()) );
+                    drawPolyShape( static_cast<b2PolygonShape*>(fixture->GetShape()), body);
                     break;
                 default:
                     // not implemented
@@ -238,6 +244,38 @@ void draw(void)
     }
 }
 
+// Creates a polygon
+void create_polygon(b2BodyType type, b2Vec2 *vertices, int amount)
+{
+
+    b2BodyDef bodyDef;
+
+    //bodyDef.position.Set(0.0f, 4.0f);
+    
+    // Add body to the world
+    bodyDef.type = type;
+    b2Body* body = world->CreateBody(&bodyDef);
+
+
+    //if(calculate_area() < 0){
+     //   vertices_new = swap_elements(vertices_new, 4);
+    //};
+
+    // Set shape and vertices
+    b2PolygonShape polyShape;
+    polyShape.Set(vertices, amount);
+
+    b2FixtureDef fixtureDef;
+
+    // Decide shape, density and friction
+    fixtureDef.shape = &polyShape;
+    fixtureDef.density = 1.0f;
+    fixtureDef.friction = 0.3f;
+
+    body->CreateFixture(&fixtureDef);
+}
+
+
 /*
  * Called when window is resized. We inform OpenGL about this, and save this
  * for future reference.
@@ -271,6 +309,24 @@ void key_pressed(unsigned char key, int x, int y)
  */
 void mouse_clicked(int button, int state, int x, int y)
 {
+    // Only in case of click down
+    if(state == GLUT_DOWN)
+    {
+        // add new position to vertices and increment
+        vertices_new[number].Set(x / 100.0, (reso_y - y) /100.0);
+        number += 1;
+
+        // Create dynamic body in case of enough vertices (4)
+        if(number == 4)
+        {
+            // Reset the number
+            number = 0;
+
+            // Create a dynamic object
+            create_polygon(b2_dynamicBody, vertices_new, 4);
+        }
+    }
+
 
 }
 
