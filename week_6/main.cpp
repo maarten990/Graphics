@@ -26,6 +26,8 @@ void createBall(unsigned level);
 void createGoal(unsigned int level);
 void drawCircle(b2CircleShape *shape, b2Vec2 position);
 void drawPolyShape(b2PolygonShape *shape);
+void createPolygon(b2BodyType type, b2Vec2 *vertices, int amount);
+float  calculateArea(b2Vec2 *vertices, int amount);
 void drawWorld();
 
 unsigned int reso_x = 800, reso_y = 600; // Window size in pixels
@@ -101,6 +103,30 @@ void createBall(unsigned level)
     ball->CreateFixture(&fixture);
 }
 
+// Creates a polygon
+void createPolygon(b2BodyType type, b2Vec2 *vertices, int amount)
+{
+    b2BodyDef bodyDef;
+
+    // Add body to the world
+    bodyDef.type = type;
+    b2Body* body = world->CreateBody(&bodyDef);
+
+    printf("\nArea: %f\n\n\n", calculateArea(vertices, amount));
+    // create the shape and fixture
+    b2PolygonShape polyShape;
+    polyShape.Set(vertices, amount);
+
+    b2FixtureDef fixtureDef;
+
+    // Decide shape, density and friction
+    fixtureDef.shape = &polyShape;
+    fixtureDef.density = 1.0f;
+    fixtureDef.friction = 0.3f;
+
+    body->CreateFixture(&fixtureDef);
+}
+
 // create the goal
 void createGoal(unsigned int level)
 {
@@ -116,18 +142,25 @@ void createGoal(unsigned int level)
     goal->SetUserData(static_cast<void*>(&GOAL));
 }
 
+// Calculates the area of a polygon spanned with vertices
+float calculateArea(b2Vec2 *vertices, int amount)
+{
+    float area = 0;
+    for(int i = 0; i < (amount - 1) ; i++)
+    {
+        printf("points: %f, %f\n", vertices[i].x, vertices[i].y);
+        area += ((vertices[i].x * vertices[i+1].y) - (vertices[i+1].x * vertices[i].y));
+    }
+    printf(" \n");
+    return 0.5 * area;
+}
+
+
 // adds a given level to the global world as a series of static objects
 void createLevel(level_t &level)
 {
     poly_t poly;
     int num_verts;
-
-    // create the body definition and the body itself
-    b2BodyDef def;
-    def.type = b2_staticBody;
-    def.position.Set(0, 0);
-
-    b2Body *level_body = world->CreateBody(&def);
 
     // loop through each polygon
     for (unsigned p = 0; p < level.num_polygons; ++p) {
@@ -143,18 +176,14 @@ void createLevel(level_t &level)
                             poly.verts[v].y);
         }
 
-        /* this is where the magic happens */
-
-        // create the shape and fixture
-        b2PolygonShape shape;
-        shape.Set(vertices, num_verts);
-
-        // add the fixture
-        level_body->CreateFixture(&shape, 0.0f);
+        // create the new object
+        createPolygon(b2_staticBody, vertices, num_verts);
 
         delete[] vertices;
     }
 }
+
+
 
 // draws a circle
 void drawCircle(b2CircleShape *shape, b2Vec2 position)
@@ -285,38 +314,6 @@ void draw(void)
     }
 }
 
-// Creates a polygon
-void create_polygon(b2BodyType type, b2Vec2 *vertices, int amount)
-{
-
-    b2BodyDef bodyDef;
-
-    //bodyDef.position.Set(0.0f, 4.0f);
-    
-    // Add body to the world
-    bodyDef.type = type;
-    b2Body* body = world->CreateBody(&bodyDef);
-
-
-    //if(calculate_area() < 0){
-     //   vertices_new = swap_elements(vertices_new, 4);
-    //};
-
-    // Set shape and vertices
-    b2PolygonShape polyShape;
-    polyShape.Set(vertices, amount);
-
-    b2FixtureDef fixtureDef;
-
-    // Decide shape, density and friction
-    fixtureDef.shape = &polyShape;
-    fixtureDef.density = 1.0f;
-    fixtureDef.friction = 0.3f;
-
-    body->CreateFixture(&fixtureDef);
-}
-
-
 /*
  * Called when window is resized. We inform OpenGL about this, and save this
  * for future reference.
@@ -355,6 +352,7 @@ void mouse_clicked(int button, int state, int x, int y)
     {
         // add new position to vertices and increment
         vertices_new[number].Set(x / 100.0, (reso_y - y) /100.0);
+        printf("added position: %f, %f\n", x /100.0, (reso_y - y) / 100.0);
         number += 1;
 
         // Create dynamic body in case of enough vertices (4)
@@ -364,7 +362,7 @@ void mouse_clicked(int button, int state, int x, int y)
             number = 0;
 
             // Create a dynamic object
-            create_polygon(b2_dynamicBody, vertices_new, 4);
+            createPolygon(b2_dynamicBody, vertices_new, 4);
         }
     }
 
