@@ -157,6 +157,7 @@ float calculateArea(b2Vec2 *vertices, int amount)
         printf("points: %f, %f\n", vertices[i].x, vertices[i].y);
         area += ((vertices[i].x * vertices[i+1].y) - (vertices[i+1].x * vertices[i].y));
     }
+        area += ((vertices[amount-1].x * vertices[0].y) - (vertices[0].x * vertices[amount-1].y));
     printf(" \n");
     return 0.5 * area;
 }
@@ -384,6 +385,7 @@ void mouse_clicked(int button, int state, int x, int y)
  */
 void mouse_moved(int x, int y)
 {
+    printf("moved to: %d, %d\n", x, y);
 
 }
 
