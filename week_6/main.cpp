@@ -17,10 +17,13 @@
 #include <Box2D/Box2D.h>
 
 #include "levels.h"
+#include "constants.h"
+#include "GoalListener.h"
 
 // prototypes
 void createLevel(level_t &level);
 void createBall(unsigned level);
+void createGoal(unsigned int level);
 void drawCircle(b2CircleShape *shape, b2Vec2 position);
 void drawPolyShape(b2PolygonShape *shape);
 void drawWorld();
@@ -42,7 +45,9 @@ unsigned g_level;
 b2Vec2 *vertices_new = new b2Vec2[4];
 int number;
 
-
+// the collission callback object and corresponding variable
+bool next_level = false;
+GoalListener goallistener(&next_level);
 
 /*
  * Load a given world, i.e. read the world from the `levels' data structure and
@@ -62,9 +67,11 @@ void load_world(unsigned int level)
     // (including the ball).
     b2Vec2 gravity(0.0, -10);
     world = new b2World(gravity);
+    world->SetContactListener(&goallistener);
 
     // create the level
     createBall(level);
+    createGoal(level);
     createLevel( levels[level] );
 
     g_level = level;
@@ -79,6 +86,7 @@ void createBall(unsigned level)
     ballDef.position.Set(levels[level].start.x, levels[level].start.y);
 
     b2Body *ball = world->CreateBody(&ballDef);
+    ball->SetUserData(static_cast<int*>(&BALL));
 
     // shape
     b2CircleShape ballShape;
@@ -91,6 +99,21 @@ void createBall(unsigned level)
     //fixture.friction = 0.3;
 
     ball->CreateFixture(&fixture);
+}
+
+// create the goal
+void createGoal(unsigned int level)
+{
+    b2BodyDef goaldef;
+    goaldef.type = b2_staticBody;
+    goaldef.position.Set(levels[level].end.x, levels[level].end.y);
+
+    b2PolygonShape goalshape;
+    goalshape.SetAsBox(0.05, 0.05);
+
+    b2Body *goal = world->CreateBody(&goaldef);
+    goal->CreateFixture(&goalshape, 0.0);
+    goal->SetUserData(static_cast<void*>(&GOAL));
 }
 
 // adds a given level to the global world as a series of static objects
@@ -160,7 +183,15 @@ void drawPolyShape(b2PolygonShape *shape, b2Body *body)
     b2Vec2 vertex;
 
     glBegin(GL_TRIANGLE_FAN);
-    glColor3f(0.0, 1.0, 0.0);
+
+    // draw the goal in blue, everything else in green
+    if (body->GetUserData() &&
+        *static_cast<int*>(body->GetUserData()) == GOAL) {
+        glColor3f(0.0, 0.0, 1.0);
+    } else {
+        glColor3f(0.0, 1.0, 0.0);
+    }
+
 
     for (int i = 0; i < vs; ++i) {
         vertex = body->GetWorldPoint(shape->GetVertex(i));
@@ -194,6 +225,7 @@ void drawWorld()
         }
     }
 
+    /*
     // draw the goal
     float endx = levels[g_level].end.x,
           endy = levels[g_level].end.y;
@@ -205,6 +237,7 @@ void drawWorld()
     glVertex2f(endx + 0.05, endy + 0.05);
     glVertex2f(endx - 0.05, endy + 0.05);
     glEnd();
+    */
 }
 
 /*
@@ -227,6 +260,14 @@ void draw(void)
     //
     world->Step(1.0f/255.0f, 8, 3);
     drawWorld();
+
+    // check for a level transition
+    if (next_level) {
+        next_level = false;
+        g_level += 1;
+        load_world(g_level);
+        return;
+    }
 
     // Show rendered frame
     glutSwapBuffers();
@@ -369,7 +410,7 @@ int main(int argc, char **argv)
     printf("Loaded %d levels.\n", num_levels);
 
     // Load the first level (i.e. create all Box2D stuff).
-    load_world(2);
+    load_world(0);
 
     last_time = glutGet(GLUT_ELAPSED_TIME);
     frame_count = 0;
