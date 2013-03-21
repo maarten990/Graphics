@@ -338,6 +338,21 @@ void drawInput()
 
 }
 
+// Calculates the area of a given polygon
+double calculateArea()
+{
+    double area = 0;
+    for(int i = 0 ; i < 3; i ++)
+    {
+        area += (vertices_new[i].x * vertices_new[i+1].y) - 
+            (vertices_new[i+1].x * vertices_new[i].y);
+
+    }
+    area += (vertices_new[3].x * vertices_new[0].y) - 
+        (vertices_new[0].x * vertices_new[3].y);
+
+    return 0.5 * area;
+}
 /*
  * Called when the user clicked (or released) a mouse buttons inside the window.
  */
@@ -356,17 +371,9 @@ void mouse_clicked(int button, int state, int x, int y)
             // Reset the number
             number = 0;
 
-            // Create a dynamic object
-            // check if counter clockwise
-            b2Vec2 edge1(vertices_new[2].x - vertices_new[1].x,
-                         vertices_new[2].y - vertices_new[1].y);
+            float z = calculateArea();
 
-            b2Vec2 edge2(vertices_new[1].x - vertices_new[0].x,
-                         vertices_new[1].y - vertices_new[0].y);
-
-            float z = b2Cross(edge1, edge2);
-
-            if (z < 0)
+            if (z > 0)
                 createPolygon(b2_dynamicBody, vertices_new, 4);
             else {
                 std::vector<b2Vec2> v;
