@@ -51,6 +51,9 @@ int number;
 bool next_level = false;
 GoalListener goallistener(&next_level);
 
+// The ball body that gets attached to world
+b2Body *ball;
+
 /*
  * Load a given world, i.e. read the world from the `levels' data structure and
  * convert it into a Box2D world.
@@ -82,12 +85,12 @@ void load_world(unsigned int level)
 // creates a ball in the world
 void createBall(unsigned level)
 {
-    // definition
     b2BodyDef ballDef;
-    ballDef.type = b2_dynamicBody;
+    // definition
+    ballDef.type = b2_staticBody;
     ballDef.position.Set(levels[level].start.x, levels[level].start.y);
 
-    b2Body *ball = world->CreateBody(&ballDef);
+    ball = world->CreateBody(&ballDef);
     ball->SetUserData(static_cast<int*>(&BALL));
 
     // shape
@@ -101,6 +104,8 @@ void createBall(unsigned level)
     //fixture.friction = 0.3;
 
     ball->CreateFixture(&fixture);
+
+  
 }
 
 // Creates a polygon
@@ -321,6 +326,9 @@ void key_pressed(unsigned char key, int x, int y)
         case 27: // Esc
         case 'q':
             exit(0);
+            break;
+        case 's':
+            ball->SetType(b2_dynamicBody);
             break;
         // Add any keys you want to use, either for debugging or gameplay.
         default:
