@@ -26,6 +26,7 @@ void createBall(unsigned level);
 void createGoal(unsigned int level);
 void drawCircle(b2CircleShape *shape, b2Vec2 position);
 void drawPolyShape(b2PolygonShape *shape);
+void drawInput();
 void createPolygon(b2BodyType type, b2Vec2 *vertices, int amount);
 float  calculateArea(b2Vec2 *vertices, int amount);
 void drawWorld();
@@ -280,6 +281,7 @@ void draw(void)
     //
     world->Step(1.0f/255.0f, 8, 3);
     drawWorld();
+    drawInput();
 
     // check for a level transition
     if (next_level) {
@@ -288,6 +290,7 @@ void draw(void)
         load_world(g_level);
         return;
     }
+
 
     // Show rendered frame
     glutSwapBuffers();
@@ -334,6 +337,19 @@ void key_pressed(unsigned char key, int x, int y)
         default:
             break;
     }
+}
+
+// Draw the points that were part of input
+void drawInput()
+{
+    glColor3f(1,1,1);
+    for(int i = 0; i < number; i ++)
+    {
+        glBegin(GL_POINTS);
+        glVertex2f(vertices_new[i].x, vertices_new[i].y);
+        glEnd();
+    }
+
 }
 
 /*
