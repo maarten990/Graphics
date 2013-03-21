@@ -253,20 +253,6 @@ void drawWorld()
             }
         }
     }
-
-    /*
-    // draw the goal
-    float endx = levels[g_level].end.x,
-          endy = levels[g_level].end.y;
-
-    glBegin(GL_QUADS);
-    glColor3f(0.0, 0.0, 1.0);
-    glVertex2f(endx - 0.05, endy - 0.05);
-    glVertex2f(endx + 0.05, endy - 0.05);
-    glVertex2f(endx + 0.05, endy + 0.05);
-    glVertex2f(endx - 0.05, endy + 0.05);
-    glEnd();
-    */
 }
 
 /*
