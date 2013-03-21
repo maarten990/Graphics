@@ -153,13 +153,14 @@ void draw(void)
                 b2PolygonShape* pol_shape = static_cast<b2PolygonShape*>(types->GetShape());
 
                 //printf("position x y: %f %f\n", position.x, position.y);
+    
                 glColor3f(0, 1, 0);
                 glBegin(GL_TRIANGLE_FAN);
 
                 // Draw all the vertices until there are no new ones
                 for(int i = 0; i < pol_shape->GetVertexCount(); i++)
                 {
-                    b2Vec2 vpos = pol_shape->GetVertex(i);
+                    b2Vec2 vpos = body->GetWorldPoint(pol_shape->GetVertex(i));
                     glVertex2f(vpos.x, vpos.y);
                 }
                 glEnd();
@@ -264,25 +265,27 @@ void create_dynamic_object()
 
     b2BodyDef bodyDef;
 
+    //bodyDef.position.Set(0.0f, 4.0f);
+    
+    // Add body to the world
     bodyDef.type = b2_dynamicBody;
-
-    bodyDef.position.Set(0.0f, 4.0f);
     b2Body* body = world.CreateBody(&bodyDef);
 
-    b2PolygonShape polyShape;
 
     printf(" calculate area: %f", calculate_area());
     //if(calculate_area() < 0){
      //   vertices_new = swap_elements(vertices_new, 4);
     //};
+
+    // Set shape and vertices
+    b2PolygonShape polyShape;
     polyShape.Set(vertices_new, 4);
 
     b2FixtureDef fixtureDef;
 
+    // Decide shape, density and friction
     fixtureDef.shape = &polyShape;
-
     fixtureDef.density = 1.0f;
-
     fixtureDef.friction = 0.3f;
 
     body->CreateFixture(&fixtureDef);
