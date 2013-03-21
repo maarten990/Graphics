@@ -28,7 +28,6 @@ void drawCircle(b2CircleShape *shape, b2Vec2 position);
 void drawPolyShape(b2PolygonShape *shape);
 void drawInput();
 void createPolygon(b2BodyType type, b2Vec2 *vertices, int amount);
-float  calculateArea(b2Vec2 *vertices, int amount);
 void drawWorld();
 
 unsigned int reso_x = 800, reso_y = 600; // Window size in pixels
@@ -118,7 +117,6 @@ void createPolygon(b2BodyType type, b2Vec2 *vertices, int amount)
     bodyDef.type = type;
     b2Body* body = world->CreateBody(&bodyDef);
 
-    printf("\nArea: %f\n\n\n", calculateArea(vertices, amount));
     // create the shape and fixture
     b2PolygonShape polyShape;
     polyShape.Set(vertices, amount);
@@ -147,20 +145,6 @@ void createGoal(unsigned int level)
     goal->CreateFixture(&goalshape, 0.0);
     goal->SetUserData(static_cast<void*>(&GOAL));
 }
-
-// Calculates the area of a polygon spanned with vertices
-float calculateArea(b2Vec2 *vertices, int amount)
-{
-    float area = 0;
-    for(int i = 0; i < (amount - 1) ; i++)
-    {
-        printf("points: %f, %f\n", vertices[i].x, vertices[i].y);
-        area += ((vertices[i].x * vertices[i+1].y) - (vertices[i+1].x * vertices[i].y));
-    }
-    printf(" \n");
-    return 0.5 * area;
-}
-
 
 // adds a given level to the global world as a series of static objects
 void createLevel(level_t &level)
@@ -362,7 +346,6 @@ void mouse_clicked(int button, int state, int x, int y)
     {
         // add new position to vertices and increment
         vertices_new[number].Set(x / 100.0, (reso_y - y) /100.0);
-        printf("added position: %f, %f\n", x /100.0, (reso_y - y) / 100.0);
         number += 1;
 
         // Create dynamic body in case of enough vertices (4)
@@ -372,7 +355,19 @@ void mouse_clicked(int button, int state, int x, int y)
             number = 0;
 
             // Create a dynamic object
-            createPolygon(b2_dynamicBody, vertices_new, 4);
+            // check if counter clockwise
+            b2Vec2 edge1(vertices_new[2].x - vertices_new[1].x,
+                         vertices_new[2].y - vertices_new[1].y);
+
+            b2Vec2 edge2(vertices_new[1].x - vertices_new[0].x,
+                         vertices_new[1].y - vertices_new[0].y);
+
+            float z = b2Cross(edge1, edge2);
+
+            if (z < 0)
+                createPolygon(b2_dynamicBody, vertices_new, 4);
+            else
+                printf("Error: polygons must be counter-clockwise.\n");
         }
     }
 
