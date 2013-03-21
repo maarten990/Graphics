@@ -385,7 +385,6 @@ void mouse_clicked(int button, int state, int x, int y)
  */
 void mouse_moved(int x, int y)
 {
-    printf("moved to: %d, %d\n", x, y);
 
 }
 
